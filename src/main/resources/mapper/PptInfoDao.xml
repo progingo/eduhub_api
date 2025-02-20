@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.progingo.dao.PptInfoDao">
+  <resultMap id="BaseResultMap" type="org.progingo.domain.PptInfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="slides" jdbcType="VARCHAR" property="slides" />
+    <result column="viewportSize" jdbcType="VARCHAR" property="viewportsize" />
+    <result column="viewportRatio" jdbcType="VARCHAR" property="viewportratio" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, title, slides, viewportSize, viewportRatio
+  </sql>
+  <select id="selectByExample" parameterType="org.progingo.domain.PptInfoExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ppt_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ppt_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ppt_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="org.progingo.domain.PptInfoExample">
+    delete from ppt_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.PptInfo" useGeneratedKeys="true">
+    insert into ppt_info (title, slides, viewportSize, 
+      viewportRatio)
+    values (#{title,jdbcType=VARCHAR}, #{slides,jdbcType=VARCHAR}, #{viewportsize,jdbcType=VARCHAR}, 
+      #{viewportratio,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.PptInfo" useGeneratedKeys="true">
+    insert into ppt_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="title != null">
+        title,
+      </if>
+      <if test="slides != null">
+        slides,
+      </if>
+      <if test="viewportsize != null">
+        viewportSize,
+      </if>
+      <if test="viewportratio != null">
+        viewportRatio,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="slides != null">
+        #{slides,jdbcType=VARCHAR},
+      </if>
+      <if test="viewportsize != null">
+        #{viewportsize,jdbcType=VARCHAR},
+      </if>
+      <if test="viewportratio != null">
+        #{viewportratio,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="org.progingo.domain.PptInfoExample" resultType="java.lang.Long">
+    select count(*) from ppt_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update ppt_info
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.title != null">
+        title = #{record.title,jdbcType=VARCHAR},
+      </if>
+      <if test="record.slides != null">
+        slides = #{record.slides,jdbcType=VARCHAR},
+      </if>
+      <if test="record.viewportsize != null">
+        viewportSize = #{record.viewportsize,jdbcType=VARCHAR},
+      </if>
+      <if test="record.viewportratio != null">
+        viewportRatio = #{record.viewportratio,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update ppt_info
+    set id = #{record.id,jdbcType=INTEGER},
+      title = #{record.title,jdbcType=VARCHAR},
+      slides = #{record.slides,jdbcType=VARCHAR},
+      viewportSize = #{record.viewportsize,jdbcType=VARCHAR},
+      viewportRatio = #{record.viewportratio,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="org.progingo.domain.PptInfo">
+    update ppt_info
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="slides != null">
+        slides = #{slides,jdbcType=VARCHAR},
+      </if>
+      <if test="viewportsize != null">
+        viewportSize = #{viewportsize,jdbcType=VARCHAR},
+      </if>
+      <if test="viewportratio != null">
+        viewportRatio = #{viewportratio,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.progingo.domain.PptInfo">
+    update ppt_info
+    set title = #{title,jdbcType=VARCHAR},
+      slides = #{slides,jdbcType=VARCHAR},
+      viewportSize = #{viewportsize,jdbcType=VARCHAR},
+      viewportRatio = #{viewportratio,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
