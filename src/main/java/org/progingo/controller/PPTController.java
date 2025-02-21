@@ -2,6 +2,7 @@ package org.progingo.controller;
 
 import org.progingo.controller.request.SavePPTRequest;
 import org.progingo.service.PPTService;
+import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +20,9 @@ public class PPTController {
     }
 
     @GetMapping("{id}")
-    public String getPPT(@PathVariable("id") Integer id){
+    public JsonResult getPPT(@PathVariable("id") Integer id){
         System.out.println(id);
-        return pptService.getPPT(id);
+        return JsonResult.ok(pptService.getPPT(id));
 
         /*return "[\n" +
                 "  {\n" +
