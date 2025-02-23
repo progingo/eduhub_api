@@ -8,6 +8,8 @@ import org.progingo.domain.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
+
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
@@ -20,4 +22,9 @@ public class UserRepositoryImpl implements UserRepository {
         return r == 1;
     }
 
+    @Override
+    public void updateUser(User user) {
+        user.setGmtModify(new Date());
+        userDao.updateByPrimaryKeySelective(user);
+    }
 }

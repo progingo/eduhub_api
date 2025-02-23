@@ -42,4 +42,15 @@ public class UserHelper {
 
         return ActionResult.ok();
     }
+
+    public ActionResult checkUpdateBaseInfoUser(User user) {
+        if (user.getNickname() == null || user.getNickname().isEmpty() || user.getNickname().length() > 10){
+            return ActionResult.fail(ResultCode.NAME_INVA);
+        }
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        if (user.getEmail() != null && !user.getEmail().matches(emailRegex)){
+            return ActionResult.fail(ResultCode.EMAIL_INVA);
+        }
+        return ActionResult.ok();
+    }
 }

@@ -44,7 +44,7 @@ public class TokenUtil {
         stringRedisTemplate.delete(RedisPrefix.USER_LOGIN_TOKEN + token);
     }
 
-    public void deleteIdToken(Integer id,UserType userType){
+    public void deleteIdToken(Integer id){
         Set<String> keys = stringRedisTemplate.keys(RedisPrefix.USER_LOGIN_TOKEN + "*");
         for (String key : keys) {
             String userJson = stringRedisTemplate.opsForValue().get(key);
@@ -52,18 +52,6 @@ public class TokenUtil {
 
             if (user != null && id.equals(user.getId()))
                 stringRedisTemplate.delete(key);
-        }
-    }
-
-    public enum UserType{
-        USER(0),
-        STORE(1)
-
-        ;
-        private Integer code;
-
-        UserType(Integer code) {
-            this.code = code;
         }
     }
 

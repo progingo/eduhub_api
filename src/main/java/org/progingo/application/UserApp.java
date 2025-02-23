@@ -4,6 +4,7 @@ package org.progingo.application;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.progingo.dao.UserDao;
 import org.progingo.domain.user.*;
+import org.progingo.infrastructure.repository.UserAdapter;
 import org.progingo.util.JsonResult;
 import org.progingo.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ public class UserApp {
     private TokenUtil tokenUtil;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserAdapter userAdapter;
 
     public ActionResult signUser(User signUser){
         UserExample userExample = new UserExample();
@@ -58,15 +61,15 @@ public class UserApp {
             return ActionResult.fail(ResultCode.LOGIN_FAIL);
         }
 
-
-        UserBO userBO = UserBO.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .nickname(user.getNickname())
-                .phone(user.getPhone())
-                .email(user.getEmail())
-                .build();
+        UserBO userBO = userAdapter.toBO(user);
         String token = tokenUtil.saveUserCache(userBO);
         return ActionResult.ok(token);
+    }
+
+
+    public ActionResult updateUser(User user) {
+        userRepository.updateUser(user);
+        tokenUtil.deleteIdToken(user.getId());
+        return ActionResult.ok();
     }
 }
