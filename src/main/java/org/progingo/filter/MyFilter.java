@@ -38,6 +38,8 @@ public class MyFilter extends BasicHttpAuthenticationFilter {
         Subject subject = SecurityUtils.getSubject();
         if (token != null) {
             subject.login(myToken);
+        }else{
+            subject.login(new JWTToken(""));
         }
         return true;
     }

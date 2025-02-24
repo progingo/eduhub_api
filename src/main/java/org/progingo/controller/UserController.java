@@ -41,4 +41,16 @@ public class UserController {
         UserBO user = (UserBO)SecurityUtils.getSubject().getPrincipal();
         return userService.updateUserBaseInfo(user,userUpdateBaseInfoRequest);
     }
+
+    /**
+     * 获取username用户创建的项目
+     * @param username 被查看的那个人，也就是查看username这个人创建的项目
+     * @return
+     */
+    @GetMapping("/getCreateProject/{username}")
+    @RequiresAuthentication
+    public JsonResult getCreateProject(@PathVariable String username){
+        UserBO user = (UserBO)SecurityUtils.getSubject().getPrincipal();
+        return userService.getCreateProject(user,username);
+    }
 }
