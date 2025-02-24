@@ -1,10 +1,9 @@
 package org.progingo.service;
 
-import org.apache.shiro.crypto.hash.Md5Hash;
 import org.progingo.application.UserApp;
-import org.progingo.controller.request.UserLoginRequest;
-import org.progingo.controller.request.UserSignRequest;
-import org.progingo.controller.request.UserUpdateBaseInfoRequest;
+import org.progingo.controller.request.user.UserLoginRequest;
+import org.progingo.controller.request.user.UserSignRequest;
+import org.progingo.controller.request.user.UserUpdateBaseInfoRequest;
 import org.progingo.controller.vo.UserInfoVO;
 import org.progingo.domain.user.*;
 import org.progingo.infrastructure.repository.UserAdapter;

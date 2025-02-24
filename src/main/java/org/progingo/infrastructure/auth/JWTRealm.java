@@ -54,7 +54,7 @@ public class JWTRealm extends AuthorizingRealm {
         if (token == null || token.isEmpty()){//如果没有token就以游客身份记录
             System.out.println("游客身份");
             SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
-                    UserBO.builder().id(null).build(),
+                    UserBO.builder().id(null).username("").build(),
                     token,
                     this.getName());
             return info;
@@ -65,7 +65,7 @@ public class JWTRealm extends AuthorizingRealm {
         if (userCache == null){//无效token就以游客身份记录
             System.out.println("无效token");
             SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
-                    UserBO.builder().id(null).build(),
+                    UserBO.builder().id(null).username("").build(),
                     token,
                     this.getName());
             return info;

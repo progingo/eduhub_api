@@ -1,6 +1,6 @@
 package org.progingo.controller;
 
-import org.progingo.controller.request.SavePPTRequest;
+import org.progingo.controller.request.ppt.SavePPTRequest;
 import org.progingo.service.PPTService;
 import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;

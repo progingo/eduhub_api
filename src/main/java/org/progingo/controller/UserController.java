@@ -2,9 +2,9 @@ package org.progingo.controller;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.progingo.controller.request.UserLoginRequest;
-import org.progingo.controller.request.UserSignRequest;
-import org.progingo.controller.request.UserUpdateBaseInfoRequest;
+import org.progingo.controller.request.user.UserLoginRequest;
+import org.progingo.controller.request.user.UserSignRequest;
+import org.progingo.controller.request.user.UserUpdateBaseInfoRequest;
 import org.progingo.domain.user.UserBO;
 import org.progingo.service.UserService;
 import org.progingo.util.JsonResult;

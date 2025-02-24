@@ -1,4 +1,4 @@
-package org.progingo.controller.request;
+package org.progingo.controller.request.ppt;
 
 import lombok.Data;
 import org.progingo.domain.PageElement;

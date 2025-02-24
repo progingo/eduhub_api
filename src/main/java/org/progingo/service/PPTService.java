@@ -1,13 +1,11 @@
 package org.progingo.service;
 
 import com.alibaba.fastjson2.JSON;
-import org.progingo.controller.request.SavePPTRequest;
+import org.progingo.controller.request.ppt.SavePPTRequest;
 import org.progingo.dao.PptInfoDao;
 import org.progingo.domain.PptInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
 
 @Service
 public class PPTService {
