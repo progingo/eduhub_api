@@ -15,6 +15,8 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private UserAdapter userAdapter;
 
     @Override
     public boolean saveUser(User user) {
@@ -26,5 +28,22 @@ public class UserRepositoryImpl implements UserRepository {
     public void updateUser(User user) {
         user.setGmtModify(new Date());
         userDao.updateByPrimaryKeySelective(user);
+    }
+
+    @Override
+    public UserBO findUserByUsername(String username) {
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andUsernameEqualTo(username);
+        User user = userDao.selectByExample(userExample).stream().findFirst().orElse(null);
+        return userAdapter.toBO(user);
+
+    }
+
+
+    @Override
+    public boolean haveUser(String username) {
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andUsernameEqualTo(username);
+        return userDao.countByExample(userExample) > 0;
     }
 }

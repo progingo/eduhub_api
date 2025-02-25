@@ -3,9 +3,12 @@ package org.progingo.application;
 import org.progingo.domain.project.Project;
 import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.user.ActionResult;
+import org.progingo.domain.user.ResultCode;
+import org.progingo.domain.user.UserBO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -26,4 +29,19 @@ public class ProjectApp {
 
     }
 
+    public ActionResult addProjectMember(UserBO user, String projectKey, Set<String> addMemberSet) {
+        if (user.isTourist()){
+            return ActionResult.fail(ResultCode.PERMISSION_DENIED);
+        }
+
+        boolean isAdmin = projectRepository.isAdmin(projectKey, user.getUsername());
+        if (!isAdmin){
+            return ActionResult.fail(ResultCode.PERMISSION_DENIED);
+        }
+
+        //添加成员
+        int num = projectRepository.addMember(projectKey, addMemberSet);
+        return ActionResult.ok(String.valueOf(num));
+
+    }
 }

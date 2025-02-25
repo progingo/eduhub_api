@@ -11,6 +11,7 @@ public enum ResultCode {
     EMAIL_INVA("邮箱格式不正确"),
     PHONE_EXIST("手机号已存在"),
     LOGIN_FAIL("登录失败"),
+    PERMISSION_DENIED("权限不足"),
 
     ;
 
