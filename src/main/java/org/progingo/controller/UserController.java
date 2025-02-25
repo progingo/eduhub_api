@@ -53,4 +53,11 @@ public class UserController {
         UserBO user = (UserBO)SecurityUtils.getSubject().getPrincipal();
         return userService.getCreateProject(user,username);
     }
+
+    @GetMapping("/getJoinProject")
+    @RequiresAuthentication
+    public JsonResult getJoinProject(){
+        UserBO user = (UserBO)SecurityUtils.getSubject().getPrincipal();
+        return userService.getJoinProject(user);
+    }
 }

@@ -112,4 +112,26 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         });
         return num.get();
     }
+
+    @Override
+    public List<ProjectBO> findProjectByMemberUsername(String username) {
+        ProjectMemberExample projectMemberExample = new ProjectMemberExample();
+        projectMemberExample.createCriteria()
+                .andUsernameEqualTo(username)
+                .andIsDeleteEqualTo(false);
+        Set<String> projectSet = projectMemberDao.selectByExample(projectMemberExample).stream()
+                .map(ProjectMember::getProjectKey)
+                .collect(Collectors.toSet());
+
+        List<ProjectBO> projectBOList = projectSet.stream().map(x -> {
+            ProjectExample projectExample = new ProjectExample();
+            projectExample.createCriteria()
+                    .andKeyEqualTo(x)
+                    .andIsDeleteEqualTo(false);
+            Project project = projectDao.selectByExample(projectExample).stream().findFirst().orElse(null);
+            return projectAdapter.toBO(project);
+        }).collect(Collectors.toList());
+
+        return projectBOList;
+    }
 }

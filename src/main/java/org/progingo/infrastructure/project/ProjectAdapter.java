@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 public class ProjectAdapter {
 
     public ProjectBO toBO(Project project){
+        if (project == null)
+            return null;
         return ProjectBO.builder()
                 .id(project.getId())
                 .key(project.getKey())

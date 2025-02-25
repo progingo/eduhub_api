@@ -132,4 +132,15 @@ public class UserService {
 
         return JsonResult.ok(projectVOList);
     }
+
+    public JsonResult getJoinProject(UserBO user) {
+        if (user.isTourist()){
+            return JsonResult.fail(401, "请重新登陆");
+        }
+        List<ProjectBO> projectList = projectRepository.findProjectByMemberUsername(user.getUsername());
+        List<ProjectVO> projectVOList = projectList.stream()
+                .map(x -> projectAdapter.toVO(x))
+                .collect(Collectors.toList());
+        return JsonResult.ok(projectVOList);
+    }
 }
