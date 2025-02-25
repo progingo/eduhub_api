@@ -1,5 +1,6 @@
 package org.progingo.service;
 
+import cn.hutool.core.util.BooleanUtil;
 import org.progingo.application.ProjectApp;
 import org.progingo.controller.request.project.AddMemberRequest;
 import org.progingo.controller.request.project.CreateProjectRequest;
@@ -32,9 +33,10 @@ public class ProjectService {
         if (username.isEmpty()){
             return JsonResult.ok(401,"请重新登陆");
         }
+        System.out.println(createProjectRequest.getIsPrivate().equals(1));
         Project project = Project.builder()
                 .projectName(createProjectRequest.getProjectName())
-                .isPrivate(createProjectRequest.getIsPrivate())
+                .isPrivate(createProjectRequest.getIsPrivate().equals(1))
                 .build();
 
         ActionResult checkActionResult = projectHelper.checkCreateProject(project);

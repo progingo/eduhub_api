@@ -12,5 +12,5 @@ public class CreateProjectRequest {
     /**
      * 公开0/私有1
      */
-    private Boolean isPrivate;
+    private Integer isPrivate;
 }
