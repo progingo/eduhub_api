@@ -106,7 +106,7 @@ public class UserService {
     }
 
     /**
-     * ①自己查看自己创建的项目。自己就是user.username，这时username为null或者user.username == username
+     * ①自己查看自己创建的项目。自己就是user.username，这时username为mine或者user.username == username
      * ②别人查看自己创建的项目。user.username != username 或者 user.username == ""
      * @param user 访问者
      * @param username 被访问者
@@ -114,13 +114,14 @@ public class UserService {
      */
     public JsonResult getCreateProject(UserBO user, String username) {
         List<ProjectBO> projectBOList;
-        if (username != null){
+        if (!"mine".equals(username)){
             projectBOList = projectRepository.findProjectByPossessorUsername(username);
         }else{
+
             projectBOList = projectRepository.findProjectByPossessorUsername(user.getUsername());
         }
 
-        if (username != null &&  !username.equals(user.getUsername())){
+        if (!"mine".equals(username) &&  !username.equals(user.getUsername())){
             //查看他人的项目，需要去除私有的资源
             projectBOList.removeIf(ProjectBO::getIsPrivate);
         }

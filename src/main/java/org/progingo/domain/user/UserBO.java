@@ -20,4 +20,8 @@ public class UserBO {
     private String email;
 
     private static final long serialVersionUID = 1L;
+
+    public boolean isTourist(){
+        return "".equals(username);
+    }
 }
