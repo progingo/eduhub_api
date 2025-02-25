@@ -6,6 +6,8 @@ import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/api/ppt")
 public class PPTController {
@@ -17,6 +19,18 @@ public class PPTController {
     public void savePPT(@RequestBody SavePPTRequest savePPTRequest){
         //System.out.println(savePPTRequest);
         pptService.savePPT(savePPTRequest);
+    }
+
+    @GetMapping("/{id1}/{id2}")
+    public JsonResult getPPTS(@PathVariable("id1") Integer id1,@PathVariable("id2") Integer id2) {
+        System.out.println(id1);
+        System.out.println(id2);
+        String ppt1 = pptService.getPPT(id1);
+        String ppt2 = pptService.getPPT(id2);
+        ArrayList<String> datas = new ArrayList<>();
+        datas.add(ppt1);
+        datas.add(ppt2);
+        return JsonResult.ok(datas);
     }
 
     @GetMapping("{id}")
