@@ -12,7 +12,7 @@ public class ProjectAdapter {
         return ProjectBO.builder()
                 .id(project.getId())
                 .key(project.getKey())
-                .objectName(project.getObjectName())
+                .projectName(project.getProjectName())
                 .possessorUsername(project.getPossessorUsername())
                 .isPrivate(project.getIsPrivate())
                 .isDelete(project.getIsDelete())
@@ -24,7 +24,7 @@ public class ProjectAdapter {
     public ProjectVO toVO(ProjectBO projectBO){
         return ProjectVO.builder()
                 .key(projectBO.getKey())
-                .objectName(projectBO.getObjectName())
+                .projectName(projectBO.getProjectName())
                 .possessorUsername(projectBO.getPossessorUsername())
                 .isPrivate(projectBO.getIsPrivate())
                 .build();

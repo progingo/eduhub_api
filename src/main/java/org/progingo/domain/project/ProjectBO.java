@@ -22,7 +22,7 @@ public class ProjectBO implements Serializable {
     /**
      * 项目名称
      */
-    private String objectName;
+    private String projectName;
 
     /**
      * 所属人的username
