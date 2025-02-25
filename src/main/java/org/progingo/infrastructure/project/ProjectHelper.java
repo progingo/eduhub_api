@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProjectHelper {
     public ActionResult checkCreateProject(Project project) {
-        if (project.getObjectName() == null || project.getIsPrivate() == null){
+        if (project.getProjectName() == null || project.getIsPrivate() == null){
             return ActionResult.fail("参数错误");
         }
 
-        if (project.getObjectName().isEmpty()){
+        if (project.getProjectName().isEmpty()){
             return ActionResult.fail("项目名称不能为空");
-        }if (project.getObjectName().length() > 50){
+        }if (project.getProjectName().length() > 50){
             return ActionResult.fail("项目名称不能大于50字符");
         }
 

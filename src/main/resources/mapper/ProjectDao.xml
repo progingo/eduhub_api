@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="org.progingo.domain.project.Project">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="key" jdbcType="VARCHAR" property="key" />
-    <result column="object_name" jdbcType="VARCHAR" property="objectName" />
+    <result column="project_name" jdbcType="VARCHAR" property="projectName" />
     <result column="possessor_username" jdbcType="VARCHAR" property="possessorUsername" />
     <result column="is_private" jdbcType="BOOLEAN" property="isPrivate" />
     <result column="is_delete" jdbcType="BOOLEAN" property="isDelete" />
@@ -69,7 +69,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, `key`, object_name, possessor_username, is_private, is_delete, gmt_create
+    id, `key`, project_name, possessor_username, is_private, is_delete, gmt_create
   </sql>
   <select id="selectByExample" parameterType="org.progingo.domain.project.ProjectExample" resultMap="BaseResultMap">
     select
@@ -102,10 +102,10 @@
     </if>
   </delete>
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.project.Project" useGeneratedKeys="true">
-    insert into project (`key`, object_name, possessor_username, 
+    insert into project (`key`, project_name, possessor_username, 
       is_private, is_delete, gmt_create
       )
-    values (#{key,jdbcType=VARCHAR}, #{objectName,jdbcType=VARCHAR}, #{possessorUsername,jdbcType=VARCHAR}, 
+    values (#{key,jdbcType=VARCHAR}, #{projectName,jdbcType=VARCHAR}, #{possessorUsername,jdbcType=VARCHAR}, 
       #{isPrivate,jdbcType=BOOLEAN}, #{isDelete,jdbcType=BOOLEAN}, #{gmtCreate,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -115,8 +115,8 @@
       <if test="key != null">
         `key`,
       </if>
-      <if test="objectName != null">
-        object_name,
+      <if test="projectName != null">
+        project_name,
       </if>
       <if test="possessorUsername != null">
         possessor_username,
@@ -135,8 +135,8 @@
       <if test="key != null">
         #{key,jdbcType=VARCHAR},
       </if>
-      <if test="objectName != null">
-        #{objectName,jdbcType=VARCHAR},
+      <if test="projectName != null">
+        #{projectName,jdbcType=VARCHAR},
       </if>
       <if test="possessorUsername != null">
         #{possessorUsername,jdbcType=VARCHAR},
@@ -167,8 +167,8 @@
       <if test="record.key != null">
         `key` = #{record.key,jdbcType=VARCHAR},
       </if>
-      <if test="record.objectName != null">
-        object_name = #{record.objectName,jdbcType=VARCHAR},
+      <if test="record.projectName != null">
+        project_name = #{record.projectName,jdbcType=VARCHAR},
       </if>
       <if test="record.possessorUsername != null">
         possessor_username = #{record.possessorUsername,jdbcType=VARCHAR},
@@ -191,7 +191,7 @@
     update project
     set id = #{record.id,jdbcType=INTEGER},
       `key` = #{record.key,jdbcType=VARCHAR},
-      object_name = #{record.objectName,jdbcType=VARCHAR},
+      project_name = #{record.projectName,jdbcType=VARCHAR},
       possessor_username = #{record.possessorUsername,jdbcType=VARCHAR},
       is_private = #{record.isPrivate,jdbcType=BOOLEAN},
       is_delete = #{record.isDelete,jdbcType=BOOLEAN},
@@ -206,8 +206,8 @@
       <if test="key != null">
         `key` = #{key,jdbcType=VARCHAR},
       </if>
-      <if test="objectName != null">
-        object_name = #{objectName,jdbcType=VARCHAR},
+      <if test="projectName != null">
+        project_name = #{projectName,jdbcType=VARCHAR},
       </if>
       <if test="possessorUsername != null">
         possessor_username = #{possessorUsername,jdbcType=VARCHAR},
@@ -227,7 +227,7 @@
   <update id="updateByPrimaryKey" parameterType="org.progingo.domain.project.Project">
     update project
     set `key` = #{key,jdbcType=VARCHAR},
-      object_name = #{objectName,jdbcType=VARCHAR},
+      project_name = #{projectName,jdbcType=VARCHAR},
       possessor_username = #{possessorUsername,jdbcType=VARCHAR},
       is_private = #{isPrivate,jdbcType=BOOLEAN},
       is_delete = #{isDelete,jdbcType=BOOLEAN},

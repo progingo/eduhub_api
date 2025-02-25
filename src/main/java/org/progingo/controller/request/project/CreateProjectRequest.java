@@ -8,7 +8,7 @@ public class CreateProjectRequest {
     /**
      * 项目名称
      */
-    private String objectName;
+    private String projectName;
     /**
      * 公开0/私有1
      */
