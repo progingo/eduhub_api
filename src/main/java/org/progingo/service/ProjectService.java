@@ -24,7 +24,7 @@ public class ProjectService {
             return JsonResult.ok(401,"请重新登陆");
         }
         Project project = Project.builder()
-                .objectName(createProjectRequest.getObjectName())
+                .projectName(createProjectRequest.getProjectName())
                 .isPrivate(createProjectRequest.getIsPrivate())
                 .build();
 

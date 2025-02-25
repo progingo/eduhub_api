@@ -6,7 +6,6 @@ import org.progingo.domain.user.ActionResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.UUID;
 
 @Component
