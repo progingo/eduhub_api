@@ -223,4 +223,19 @@ public class PPTController {
                 "  }\n" +
                 "]";*/
     }
+
+    @GetMapping("/init")
+    public String getInitPPT(){
+
+        return "[\n" +
+                "    {\n" +
+                "      \"id\": \"test-slide-1\",\n" +
+                "      \"elements\": [],\n" +
+                "      \"background\": {\n" +
+                "        \"type\": \"solid\",\n" +
+                "        \"color\": \"#fff\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  ]";
+    }
 }
