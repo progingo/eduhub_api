@@ -93,6 +93,38 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         return projectNumber + projectMemberNumber > 0;
     }
 
+    /**
+     * 查询是否为项目组成员，包括管理员和创建者
+     * @param projectKey
+     * @param username
+     * @return
+     */
+    @Override
+    public boolean isMember(String projectKey, String username) {
+        ProjectExample projectExample = new ProjectExample();
+        projectExample.createCriteria()
+                .andPossessorUsernameEqualTo(username)
+                .andKeyEqualTo(projectKey);
+        long projectNumber = projectDao.countByExample(projectExample);
+
+        ProjectMemberExample projectMemberExample = new ProjectMemberExample();
+        projectMemberExample.createCriteria()
+                .andProjectKeyEqualTo(projectKey)
+                .andUsernameEqualTo(username)
+                .andRoleEqualTo(ProjectMemberRole.ADMIN.getCode())
+                .andIsDeleteEqualTo(false);
+
+        projectMemberExample.or()
+                .andProjectKeyEqualTo(projectKey)
+                .andUsernameEqualTo(username)
+                .andRoleEqualTo(ProjectMemberRole.MEMBER.getCode())
+                .andIsDeleteEqualTo(false);
+
+        long projectMemberNumber = projectMemberDao.countByExample(projectMemberExample);
+
+        return projectNumber + projectMemberNumber > 0;
+    }
+
     @Override
     public int addMember(String projectKey, Set<String> addMemberSet) {
         AtomicInteger num = new AtomicInteger();

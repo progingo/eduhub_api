@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.progingo.dao.PptGitTreeDao">
+  <resultMap id="BaseResultMap" type="org.progingo.domain.PptGitTree">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="key" jdbcType="VARCHAR" property="key" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="resource_key" jdbcType="VARCHAR" property="resourceKey" />
+    <result column="ppt_key" jdbcType="VARCHAR" property="pptKey" />
+    <result column="is_root" jdbcType="BOOLEAN" property="isRoot" />
+    <result column="operation" jdbcType="INTEGER" property="operation" />
+    <result column="parent_key" jdbcType="VARCHAR" property="parentKey" />
+    <result column="merge_parent_key" jdbcType="VARCHAR" property="mergeParentKey" />
+    <result column="is_delete" jdbcType="BOOLEAN" property="isDelete" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="gmt_update" jdbcType="TIMESTAMP" property="gmtUpdate" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, `key`, remark, username, resource_key, ppt_key, is_root, `operation`, parent_key, 
+    merge_parent_key, is_delete, gmt_create, gmt_update
+  </sql>
+  <select id="selectByExample" parameterType="org.progingo.domain.PptGitTreeExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ppt_git_tree
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ppt_git_tree
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from ppt_git_tree
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="org.progingo.domain.PptGitTreeExample">
+    delete from ppt_git_tree
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.PptGitTree" useGeneratedKeys="true">
+    insert into ppt_git_tree (`key`, remark, username, 
+      resource_key, ppt_key, is_root, 
+      `operation`, parent_key, merge_parent_key, 
+      is_delete, gmt_create, gmt_update
+      )
+    values (#{key,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, 
+      #{resourceKey,jdbcType=VARCHAR}, #{pptKey,jdbcType=VARCHAR}, #{isRoot,jdbcType=BOOLEAN}, 
+      #{operation,jdbcType=INTEGER}, #{parentKey,jdbcType=VARCHAR}, #{mergeParentKey,jdbcType=VARCHAR}, 
+      #{isDelete,jdbcType=BOOLEAN}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtUpdate,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.PptGitTree" useGeneratedKeys="true">
+    insert into ppt_git_tree
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="key != null">
+        `key`,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="resourceKey != null">
+        resource_key,
+      </if>
+      <if test="pptKey != null">
+        ppt_key,
+      </if>
+      <if test="isRoot != null">
+        is_root,
+      </if>
+      <if test="operation != null">
+        `operation`,
+      </if>
+      <if test="parentKey != null">
+        parent_key,
+      </if>
+      <if test="mergeParentKey != null">
+        merge_parent_key,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create,
+      </if>
+      <if test="gmtUpdate != null">
+        gmt_update,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="key != null">
+        #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="resourceKey != null">
+        #{resourceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="pptKey != null">
+        #{pptKey,jdbcType=VARCHAR},
+      </if>
+      <if test="isRoot != null">
+        #{isRoot,jdbcType=BOOLEAN},
+      </if>
+      <if test="operation != null">
+        #{operation,jdbcType=INTEGER},
+      </if>
+      <if test="parentKey != null">
+        #{parentKey,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeParentKey != null">
+        #{mergeParentKey,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=BOOLEAN},
+      </if>
+      <if test="gmtCreate != null">
+        #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gmtUpdate != null">
+        #{gmtUpdate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="org.progingo.domain.PptGitTreeExample" resultType="java.lang.Long">
+    select count(*) from ppt_git_tree
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update ppt_git_tree
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.key != null">
+        `key` = #{record.key,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null">
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.username != null">
+        username = #{record.username,jdbcType=VARCHAR},
+      </if>
+      <if test="record.resourceKey != null">
+        resource_key = #{record.resourceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pptKey != null">
+        ppt_key = #{record.pptKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isRoot != null">
+        is_root = #{record.isRoot,jdbcType=BOOLEAN},
+      </if>
+      <if test="record.operation != null">
+        `operation` = #{record.operation,jdbcType=INTEGER},
+      </if>
+      <if test="record.parentKey != null">
+        parent_key = #{record.parentKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mergeParentKey != null">
+        merge_parent_key = #{record.mergeParentKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isDelete != null">
+        is_delete = #{record.isDelete,jdbcType=BOOLEAN},
+      </if>
+      <if test="record.gmtCreate != null">
+        gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.gmtUpdate != null">
+        gmt_update = #{record.gmtUpdate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update ppt_git_tree
+    set id = #{record.id,jdbcType=BIGINT},
+      `key` = #{record.key,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      username = #{record.username,jdbcType=VARCHAR},
+      resource_key = #{record.resourceKey,jdbcType=VARCHAR},
+      ppt_key = #{record.pptKey,jdbcType=VARCHAR},
+      is_root = #{record.isRoot,jdbcType=BOOLEAN},
+      `operation` = #{record.operation,jdbcType=INTEGER},
+      parent_key = #{record.parentKey,jdbcType=VARCHAR},
+      merge_parent_key = #{record.mergeParentKey,jdbcType=VARCHAR},
+      is_delete = #{record.isDelete,jdbcType=BOOLEAN},
+      gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      gmt_update = #{record.gmtUpdate,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="org.progingo.domain.PptGitTree">
+    update ppt_git_tree
+    <set>
+      <if test="key != null">
+        `key` = #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="resourceKey != null">
+        resource_key = #{resourceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="pptKey != null">
+        ppt_key = #{pptKey,jdbcType=VARCHAR},
+      </if>
+      <if test="isRoot != null">
+        is_root = #{isRoot,jdbcType=BOOLEAN},
+      </if>
+      <if test="operation != null">
+        `operation` = #{operation,jdbcType=INTEGER},
+      </if>
+      <if test="parentKey != null">
+        parent_key = #{parentKey,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeParentKey != null">
+        merge_parent_key = #{mergeParentKey,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=BOOLEAN},
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gmtUpdate != null">
+        gmt_update = #{gmtUpdate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.progingo.domain.PptGitTree">
+    update ppt_git_tree
+    set `key` = #{key,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      username = #{username,jdbcType=VARCHAR},
+      resource_key = #{resourceKey,jdbcType=VARCHAR},
+      ppt_key = #{pptKey,jdbcType=VARCHAR},
+      is_root = #{isRoot,jdbcType=BOOLEAN},
+      `operation` = #{operation,jdbcType=INTEGER},
+      parent_key = #{parentKey,jdbcType=VARCHAR},
+      merge_parent_key = #{mergeParentKey,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=BOOLEAN},
+      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      gmt_update = #{gmtUpdate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

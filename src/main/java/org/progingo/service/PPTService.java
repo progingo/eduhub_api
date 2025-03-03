@@ -3,7 +3,7 @@ package org.progingo.service;
 import com.alibaba.fastjson2.JSON;
 import org.progingo.controller.request.ppt.SavePPTRequest;
 import org.progingo.dao.PptInfoDao;
-import org.progingo.domain.PptInfo;
+import org.progingo.domain.ppt.PptInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

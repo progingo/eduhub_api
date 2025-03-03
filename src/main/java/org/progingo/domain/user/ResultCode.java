@@ -13,12 +13,15 @@ public enum ResultCode {
     LOGIN_FAIL("登录失败"),
     PERMISSION_DENIED("权限不足"),
 
+    PROJECT_NOT_EXIST("项目不存在"),
+    RESOURCE_NOT_EXITS("资源不存在"),
+
     ;
 
     @Getter
     private final String msg;
 
-    private ResultCode(String msg) {
+    ResultCode(String msg) {
         this.msg = msg;
     }
 
