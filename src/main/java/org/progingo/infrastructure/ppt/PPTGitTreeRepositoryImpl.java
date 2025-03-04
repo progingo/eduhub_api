@@ -2,6 +2,7 @@ package org.progingo.infrastructure.ppt;
 
 import org.progingo.dao.PptGitTreeDao;
 import org.progingo.domain.PptGitTree;
+import org.progingo.domain.PptGitTreeExample;
 import org.progingo.domain.ppt.PPTGitTreeRepository;
 import org.progingo.domain.ppt.PptGitTreeBO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,19 @@ public class PPTGitTreeRepositoryImpl implements PPTGitTreeRepository {
         pptGitTree.setGmtUpdate(new Date());
         int r = pptGitTreeDao.insert(pptGitTree);
         return r == 1;
+    }
+
+    @Override
+    public String findPPTKeyByNodeKey(String nodeKey) {
+        PptGitTreeExample pptGitTreeExample = new PptGitTreeExample();
+        pptGitTreeExample.createCriteria()
+                .andKeyEqualTo(nodeKey)
+                .andIsDeleteEqualTo(false);
+        PptGitTree pptGitTree = pptGitTreeDao.selectByExample(pptGitTreeExample).stream().findFirst().orElse(null);
+        if (pptGitTree == null){
+            return null;
+        }
+        return pptGitTree.getPptKey();
     }
 
     private PptGitTree adapter(PptGitTreeBO pptGitTreeBO) {

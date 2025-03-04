@@ -1,6 +1,10 @@
 package org.progingo.controller;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.progingo.controller.request.ppt.CreatePPTRequest;
 import org.progingo.controller.request.ppt.SavePPTRequest;
+import org.progingo.domain.user.UserBO;
 import org.progingo.service.PPTService;
 import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +16,13 @@ public class PPTController {
 
     @Autowired
     private PPTService pptService;
+
+    @PostMapping("/create")
+    @RequiresAuthentication
+    public JsonResult createPPT(@RequestBody CreatePPTRequest createPPTRequest){
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+        return pptService.createPPT(user, createPPTRequest);
+    }
 
     @PostMapping("/save")
     public void savePPT(@RequestBody SavePPTRequest savePPTRequest){

@@ -16,6 +16,8 @@ public interface ProjectRepository {
 
     boolean isMember(String projectKey, String username);
 
+    boolean isEditor(String projectKey, String username);
+
     int addMember(String projectKey, Set<String> addMemberSet);
 
     List<ProjectBO> findProjectByMemberUsername(String username);

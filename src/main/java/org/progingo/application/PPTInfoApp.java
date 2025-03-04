@@ -1,9 +1,6 @@
 package org.progingo.application;
 
-import org.progingo.domain.ppt.PPTEntity;
-import org.progingo.domain.ppt.PPTInfoBO;
-import org.progingo.domain.ppt.PPTRepository;
-import org.progingo.domain.ppt.PPTState;
+import org.progingo.domain.ppt.*;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.ResultCode;
 import org.progingo.infrastructure.ppt.PPTInfoAdapter;
@@ -17,6 +14,8 @@ public class PPTInfoApp {
 
     @Autowired
     private PPTRepository pptRepository;
+    @Autowired
+    private PPTGitTreeRepository pptGitTreeRepository;
 
     public ActionResult createBlankPPt(String username) {
         //新建一个PPT
@@ -53,6 +52,27 @@ public class PPTInfoApp {
             return ActionResult.fail("更改PPT状态失败");
         }
         return ActionResult.ok();
+
+    }
+
+    public ActionResult createPPT(String username, String nodeKey) {
+        //从nodeKey这个节点的基础上新建ppt，首先要找到这个节点的的ppt是哪个
+        String pptKeyByNodeKey = pptGitTreeRepository.findPPTKeyByNodeKey(nodeKey);
+        if (pptKeyByNodeKey == null){
+            return ActionResult.fail(ResultCode.NODE_NOT_EXIST);
+        }
+
+        String key = UUID.randomUUID().toString().replaceAll("-", "");
+        PPTInfoBO pptInfoByKey = pptRepository.findPPTInfoByKey(pptKeyByNodeKey);
+        pptInfoByKey.setKey(key);
+        pptInfoByKey.setUsername(username);
+        pptInfoByKey.setState(PPTState.NORMAL);//这里不涉及其他CRUD，所以不用先设置为CREATE再设置为NORMAL
+
+        boolean r = pptRepository.addPPTInfo(pptInfoByKey);
+        if (!r){
+            return ActionResult.fail("新建PPT失败");
+        }
+        return ActionResult.ok(key);
 
     }
 }
