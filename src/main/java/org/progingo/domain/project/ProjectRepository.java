@@ -21,4 +21,5 @@ public interface ProjectRepository {
     int addMember(String projectKey, Set<String> addMemberSet);
 
     List<ProjectBO> findProjectByMemberUsername(String username);
+    boolean reviseRole(String projectKey, String username, Integer role);
 }
