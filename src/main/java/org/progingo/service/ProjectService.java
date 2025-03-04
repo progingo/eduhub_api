@@ -4,10 +4,13 @@ import cn.hutool.core.util.BooleanUtil;
 import org.progingo.application.ProjectApp;
 import org.progingo.controller.request.project.AddMemberRequest;
 import org.progingo.controller.request.project.CreateProjectRequest;
+import org.progingo.controller.request.project.ReviseRoleRequest;
+import org.progingo.dao.UserDao;
 import org.progingo.domain.project.Project;
 import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.UserBO;
+import org.progingo.domain.user.UserExample;
 import org.progingo.infrastructure.project.ProjectHelper;
 import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,8 @@ public class ProjectService {
     private ProjectApp projectApp;
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private UserDao userDao;
 
     public JsonResult createProject(UserBO user, CreateProjectRequest createProjectRequest) {
         String username = user.getUsername();
@@ -68,5 +73,43 @@ public class ProjectService {
             return JsonResult.fail(actionResult.getMsg());
         }
         return JsonResult.ok(actionResult.getMsg());
+    }
+
+    public JsonResult getProject(String projectKey) {
+        if(projectKey == null){
+            return JsonResult.fail("项目不存在");
+        }
+        List<UserBO> projectMemberList = projectRepository.findProjectMember(projectKey);
+        if (projectMemberList.isEmpty()){
+            return JsonResult.fail("项目成员为空");
+        }
+        return JsonResult.ok(projectMemberList);
+    }
+
+    /**
+     * 修改项目成员角色
+     * @param user  当前用户
+     * @param reviseRoleRequest 修改角色请求
+     * @return
+     */
+    public JsonResult reviseRole(UserBO user, ReviseRoleRequest reviseRoleRequest) {
+        String username = user.getUsername();
+        String projectKey = reviseRoleRequest.getProjectKey();
+        if (username.isEmpty()){
+            return JsonResult.ok(401,"请重新登陆");
+        }
+        if (!projectRepository.isAdmin(projectKey, username)){
+            return JsonResult.fail("权限不足");
+        }
+        if (!projectRepository.isMember(projectKey, reviseRoleRequest.getUsername())){
+            return JsonResult.fail("成员不存在");
+        }
+        ActionResult actionResult = projectApp.reviseRole(user,projectKey,
+                reviseRoleRequest.getUsername(), reviseRoleRequest.getRole());
+        if (!actionResult.isSuccess()){
+            return JsonResult.fail(actionResult.getMsg());
+        }
+        return JsonResult.ok(actionResult.getMsg());
+
     }
 }

@@ -15,6 +15,7 @@ public enum ResultCode {
 
     PROJECT_NOT_EXIST("项目不存在"),
     RESOURCE_NOT_EXITS("资源不存在"),
+    NODE_NOT_EXIST("节点不存在"),
 
     ;
 

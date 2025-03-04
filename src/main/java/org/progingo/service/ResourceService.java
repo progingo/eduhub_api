@@ -41,7 +41,7 @@ public class ResourceService {
             return JsonResult.fail(checkResult.getMsg());
         }
 
-        boolean isAdmin = projectRepository.isMember(createResourceRequest.getProjectKey(), user.getUsername());
+        boolean isAdmin = projectRepository.isEditor(createResourceRequest.getProjectKey(), user.getUsername());
         if (!isAdmin){
             return JsonResult.fail(ResultCode.PERMISSION_DENIED.getMsg());
         }

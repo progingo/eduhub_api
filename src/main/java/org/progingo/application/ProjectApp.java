@@ -1,5 +1,7 @@
 package org.progingo.application;
 
+import org.apache.shiro.SecurityUtils;
+import org.progingo.controller.request.project.ReviseRoleRequest;
 import org.progingo.domain.project.Project;
 import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.user.ActionResult;
@@ -43,5 +45,15 @@ public class ProjectApp {
         int num = projectRepository.addMember(projectKey, addMemberSet);
         return ActionResult.ok(String.valueOf(num));
 
+    }
+    public ActionResult reviseRole(UserBO user,String projectKey, String username, Integer role) {
+        if (user.isTourist()){
+            return ActionResult.fail(ResultCode.PERMISSION_DENIED);
+        }
+        boolean isAdmin = projectRepository.isAdmin(projectKey, user.getUsername());
+        if (!isAdmin){
+            return ActionResult.fail(ResultCode.PERMISSION_DENIED);
+        }
+        return projectRepository.reviseRole(projectKey, username, role) ? ActionResult.ok() : ActionResult.fail("修改失败");
     }
 }

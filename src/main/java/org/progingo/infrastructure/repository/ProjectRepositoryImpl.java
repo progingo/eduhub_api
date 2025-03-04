@@ -100,7 +100,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
      * @return
      */
     @Override
-    public boolean isMember(String projectKey, String username) {
+    public boolean isEditor(String projectKey, String username) {
         ProjectExample projectExample = new ProjectExample();
         projectExample.createCriteria()
                 .andPossessorUsernameEqualTo(username)
@@ -122,6 +122,25 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
         long projectMemberNumber = projectMemberDao.countByExample(projectMemberExample);
 
+        return projectNumber + projectMemberNumber > 0;
+    }
+
+
+    @Override
+    public boolean isMember(String projectKey, String username) {
+        ProjectExample projectExample = new ProjectExample();
+        projectExample.createCriteria()
+                .andPossessorUsernameEqualTo(username)
+                .andKeyEqualTo(projectKey);
+        long projectNumber = projectDao.countByExample(projectExample);
+
+        ProjectMemberExample projectMemberExample = new ProjectMemberExample();
+        projectMemberExample.createCriteria()
+                .andProjectKeyEqualTo(projectKey)
+                .andUsernameEqualTo(username)
+                .andIsDeleteEqualTo(false);
+
+        long projectMemberNumber = projectMemberDao.countByExample(projectMemberExample);
         return projectNumber + projectMemberNumber > 0;
     }
 
@@ -165,5 +184,15 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         }).collect(Collectors.toList());
 
         return projectBOList;
+    }
+
+    @Override
+    public boolean reviseRole(String projectKey, String username, Integer role) {
+        ProjectMemberExample projectMemberExample = new ProjectMemberExample();
+        projectMemberExample.createCriteria()
+                .andProjectKeyEqualTo(projectKey)
+                .andUsernameEqualTo(username)
+                .andIsDeleteEqualTo(false);
+        return projectMemberDao.updateByExampleSelective(ProjectMember.builder().role(role).gmtUpdate(new Date()).build(), projectMemberExample) > 0;
     }
 }
