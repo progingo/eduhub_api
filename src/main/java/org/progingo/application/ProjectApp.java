@@ -10,6 +10,7 @@ import org.progingo.domain.user.UserBO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,6 +46,18 @@ public class ProjectApp {
         int num = projectRepository.addMember(projectKey, addMemberSet);
         return ActionResult.ok(String.valueOf(num));
 
+    }
+    public ActionResult deleteProjectMember(UserBO user, String projectKey, Set<String> deleteMemberSet){
+        if (user.isTourist()){
+            return ActionResult.fail(ResultCode.PERMISSION_DENIED);
+        }
+        boolean isAdmin = projectRepository.isAdmin(projectKey, user.getUsername());
+        if (!isAdmin){
+            return ActionResult.fail(ResultCode.PERMISSION_DENIED);
+        }
+        //删除成员
+        int num = projectRepository.deleteMember(projectKey,deleteMemberSet);
+        return ActionResult.ok(String.valueOf(num));
     }
     public ActionResult reviseRole(UserBO user,String projectKey, String username, Integer role) {
         if (user.isTourist()){

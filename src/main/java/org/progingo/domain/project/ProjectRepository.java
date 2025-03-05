@@ -1,5 +1,6 @@
 package org.progingo.domain.project;
 
+import org.progingo.controller.vo.ProjectMemberInfoVO;
 import org.progingo.domain.user.UserBO;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public interface ProjectRepository {
 
     int addMember(String projectKey, Set<String> addMemberSet);
 
+    int findProjectMemberRole(String projectKey, String username);
     List<ProjectBO> findProjectByMemberUsername(String username);
     boolean reviseRole(String projectKey, String username, Integer role);
+    int deleteMember(String projectKey, Set<String> deleteMemberSet);
 }
