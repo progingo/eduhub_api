@@ -5,7 +5,6 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.progingo.dao.UserDao;
 import org.progingo.domain.user.*;
 import org.progingo.infrastructure.repository.UserAdapter;
-import org.progingo.util.JsonResult;
 import org.progingo.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,6 +33,7 @@ public class UserApp {
             return ActionResult.fail(ResultCode.PHONE_EXIST);
         }
         signUser.setUsername(UUID.randomUUID().toString());
+        signUser.setProfilePhoto("/eduhub/profile_photo.png");
         signUser.setSalt(UUID.randomUUID().toString().replaceAll("-", ""));
         signUser.setPassword(new Md5Hash(signUser.getPassword(), signUser.getSalt(), 3).toString());
         signUser.setGmtCreate(new Date());

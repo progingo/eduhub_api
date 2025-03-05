@@ -10,6 +10,8 @@ public class UserInfoVO {
 
     private String nickname;
 
+    private String profilePhoto;
+
     private String phone;
 
     private String email;

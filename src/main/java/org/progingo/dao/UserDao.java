@@ -1,9 +1,10 @@
 package org.progingo.dao;
 
-import org.apache.ibatis.annotations.Mapper;
 import org.progingo.domain.user.User;
 import org.progingo.domain.user.UserExample;
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper

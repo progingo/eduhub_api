@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="org.progingo.domain.user.User">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="profile_photo" jdbcType="VARCHAR" property="profilePhoto" />
     <result column="nickname" jdbcType="VARCHAR" property="nickname" />
     <result column="password" jdbcType="VARCHAR" property="password" />
     <result column="salt" jdbcType="VARCHAR" property="salt" />
@@ -71,7 +72,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, username, nickname, `password`, salt, phone, email, gmt_create, gmt_modify
+    id, username, profile_photo, nickname, `password`, salt, phone, email, gmt_create, 
+    gmt_modify
   </sql>
   <select id="selectByExample" parameterType="org.progingo.domain.user.UserExample" resultMap="BaseResultMap">
     select
@@ -104,18 +106,23 @@
     </if>
   </delete>
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.user.User" useGeneratedKeys="true">
-    insert into user (username, nickname, `password`, 
-      salt, phone, email, 
-      gmt_create, gmt_modify)
-    values (#{username,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
-      #{salt,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
-      #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModify,jdbcType=TIMESTAMP})
+    insert into user (username, profile_photo, nickname, 
+      `password`, salt, phone, 
+      email, gmt_create, gmt_modify
+      )
+    values (#{username,jdbcType=VARCHAR}, #{profilePhoto,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, 
+      #{password,jdbcType=VARCHAR}, #{salt,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{email,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModify,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.user.User" useGeneratedKeys="true">
     insert into user
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="username != null">
         username,
+      </if>
+      <if test="profilePhoto != null">
+        profile_photo,
       </if>
       <if test="nickname != null">
         nickname,
@@ -142,6 +149,9 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="username != null">
         #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="profilePhoto != null">
+        #{profilePhoto,jdbcType=VARCHAR},
       </if>
       <if test="nickname != null">
         #{nickname,jdbcType=VARCHAR},
@@ -181,6 +191,9 @@
       <if test="record.username != null">
         username = #{record.username,jdbcType=VARCHAR},
       </if>
+      <if test="record.profilePhoto != null">
+        profile_photo = #{record.profilePhoto,jdbcType=VARCHAR},
+      </if>
       <if test="record.nickname != null">
         nickname = #{record.nickname,jdbcType=VARCHAR},
       </if>
@@ -211,6 +224,7 @@
     update user
     set id = #{record.id,jdbcType=INTEGER},
       username = #{record.username,jdbcType=VARCHAR},
+      profile_photo = #{record.profilePhoto,jdbcType=VARCHAR},
       nickname = #{record.nickname,jdbcType=VARCHAR},
       `password` = #{record.password,jdbcType=VARCHAR},
       salt = #{record.salt,jdbcType=VARCHAR},
@@ -227,6 +241,9 @@
     <set>
       <if test="username != null">
         username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="profilePhoto != null">
+        profile_photo = #{profilePhoto,jdbcType=VARCHAR},
       </if>
       <if test="nickname != null">
         nickname = #{nickname,jdbcType=VARCHAR},
@@ -255,6 +272,7 @@
   <update id="updateByPrimaryKey" parameterType="org.progingo.domain.user.User">
     update user
     set username = #{username,jdbcType=VARCHAR},
+      profile_photo = #{profilePhoto,jdbcType=VARCHAR},
       nickname = #{nickname,jdbcType=VARCHAR},
       `password` = #{password,jdbcType=VARCHAR},
       salt = #{salt,jdbcType=VARCHAR},

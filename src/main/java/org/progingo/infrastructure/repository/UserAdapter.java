@@ -12,6 +12,7 @@ public class UserAdapter {
             return null;
         return UserBO.builder()
                 .id(user.getId())
+                .profilePhoto(user.getProfilePhoto())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .phone(user.getPhone())
@@ -23,6 +24,7 @@ public class UserAdapter {
         if (user == null)
             return null;
         UserInfoVO userVO = UserInfoVO.builder()
+                .profilePhoto("http://101.200.241.166:9000" + user.getProfilePhoto())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .phone(user.getPhone())
