@@ -16,6 +16,11 @@ public class ResourceController {
     @Autowired
     private ResourceService resourceService;
 
+    /**
+     * 创建资源
+     * @param createResourceRequest
+     * @return
+     */
     @PostMapping("/create")
     @RequiresAuthentication
     public JsonResult createResource(@RequestBody CreateResourceRequest createResourceRequest) {
