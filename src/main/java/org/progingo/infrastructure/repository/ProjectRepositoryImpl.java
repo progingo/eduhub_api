@@ -1,5 +1,6 @@
 package org.progingo.infrastructure.repository;
 
+import org.progingo.controller.vo.ProjectMemberInfoVO;
 import org.progingo.dao.ProjectDao;
 import org.progingo.dao.ProjectMemberDao;
 import org.progingo.domain.project.*;
@@ -165,6 +166,46 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     }
 
     @Override
+    public int findProjectMemberRole(String projectKey, String username) {
+        ProjectExample projectExample = new ProjectExample();
+        projectExample.createCriteria()
+                .andPossessorUsernameEqualTo(username)
+                .andKeyEqualTo(projectKey);
+        long projectNumber = projectDao.countByExample(projectExample);
+        if (projectNumber > 0){
+            return ProjectMemberRole.MASTER.getCode();
+        }
+        ProjectMemberExample projectMemberExample = new ProjectMemberExample();
+        projectMemberExample.createCriteria()
+                .andProjectKeyEqualTo(projectKey)
+                .andUsernameEqualTo(username)
+                .andIsDeleteEqualTo(false);
+        return Objects.requireNonNull(projectMemberDao.selectByExample(projectMemberExample).stream().findFirst().orElse(null)).getRole();
+    }
+
+    @Override
+    public int deleteMember(String projectKey, Set<String> deleteMemberSet) {
+        AtomicInteger num = new AtomicInteger();
+        deleteMemberSet.forEach(x ->{
+           if (userRepository.haveUser(x)){
+               //伪删除，其实为修改is_delete字段为true
+               ProjectMember projectMember = ProjectMember.builder()
+                       .projectKey(projectKey)
+                       .username(x)
+                       .isDelete(true)
+                       .gmtUpdate(new Date())
+                       .build();
+               ProjectMemberExample projectMemberExample = new ProjectMemberExample();
+               projectMemberExample.createCriteria()
+                       .andProjectKeyEqualTo(projectKey)
+                       .andUsernameEqualTo(x);
+               num.addAndGet(projectMemberDao.updateByExampleSelective(projectMember, projectMemberExample));
+//               num.addAndGet(projectMemberDao.deleteByExample(projectMemberExample));
+           }
+        });
+        return num.get();
+    }
+    @Override
     public List<ProjectBO> findProjectByMemberUsername(String username) {
         ProjectMemberExample projectMemberExample = new ProjectMemberExample();
         projectMemberExample.createCriteria()
@@ -195,4 +236,6 @@ public class ProjectRepositoryImpl implements ProjectRepository {
                 .andIsDeleteEqualTo(false);
         return projectMemberDao.updateByExampleSelective(ProjectMember.builder().role(role).gmtUpdate(new Date()).build(), projectMemberExample) > 0;
     }
+
+
 }

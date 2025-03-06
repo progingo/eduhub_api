@@ -4,7 +4,10 @@ import cn.hutool.core.util.BooleanUtil;
 import org.progingo.application.ProjectApp;
 import org.progingo.controller.request.project.AddMemberRequest;
 import org.progingo.controller.request.project.CreateProjectRequest;
+import org.progingo.controller.request.project.DeleteMemberRequest;
 import org.progingo.controller.request.project.ReviseRoleRequest;
+
+import org.progingo.controller.vo.ProjectMemberInfoVO;
 import org.progingo.dao.UserDao;
 import org.progingo.domain.project.Project;
 import org.progingo.domain.project.ProjectRepository;
@@ -16,6 +19,7 @@ import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -74,16 +78,43 @@ public class ProjectService {
         }
         return JsonResult.ok(actionResult.getMsg());
     }
+    public JsonResult deleteProjectMember(UserBO user, DeleteMemberRequest deleteMemberRequest){
 
-    public JsonResult getProject(String projectKey) {
+        List<UserBO> projectMemberList = projectRepository.findProjectMember(deleteMemberRequest.getProjectKey());
+        Set<String> projectMemberIdSet = projectMemberList.stream().map(UserBO::getUsername).collect(Collectors.toSet());
+        //只有当成员为项目成员时才删除，并且不能删除自己
+        Set<String> addMemberSet = deleteMemberRequest.getUsernameList()
+                .stream()
+                .filter(x -> projectMemberIdSet.contains(x) && !x.equals(user.getUsername()))
+                .collect(Collectors.toSet());
+        if(addMemberSet.isEmpty()){
+            return JsonResult.fail("请选择要删除的成员");
+        }
+        ActionResult actionResult = projectApp.deleteProjectMember(user, deleteMemberRequest.getProjectKey(), addMemberSet);
+        if (!actionResult.isSuccess()) {
+            return JsonResult.fail(actionResult.getMsg());
+        }
+        return JsonResult.ok(actionResult.getMsg());
+
+
+    }
+
+    public JsonResult getProjectMember(String projectKey) {
         if(projectKey == null){
             return JsonResult.fail("项目不存在");
         }
         List<UserBO> projectMemberList = projectRepository.findProjectMember(projectKey);
-        if (projectMemberList.isEmpty()){
+        List<ProjectMemberInfoVO> projectMemberInfoVOList = projectMemberList.stream().map(x -> {
+            return ProjectMemberInfoVO.builder()
+                    .nickName(x.getNickname())
+                    .profilePhoto(x.getProfilePhoto())
+                    .role(projectRepository.findProjectMemberRole(projectKey, x.getUsername()))
+                    .build();
+        }).collect(Collectors.toList());
+        if (projectMemberInfoVOList.isEmpty()){
             return JsonResult.fail("项目成员为空");
         }
-        return JsonResult.ok(projectMemberList);
+        return JsonResult.ok(projectMemberInfoVOList);
     }
 
     /**
