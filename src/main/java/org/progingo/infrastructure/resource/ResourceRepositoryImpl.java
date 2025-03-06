@@ -46,7 +46,6 @@ public class ResourceRepositoryImpl implements ResourceRepository {
 
         ProjectExample projectExample = new ProjectExample();
         projectExample.createCriteria()
-                .andPossessorUsernameEqualTo(username)
                 .andKeyEqualTo(projectKey);
         long projectNumber = projectDao.countByExample(projectExample);
 
