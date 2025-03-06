@@ -47,6 +47,7 @@ public class ProjectController {
      */
     @GetMapping("/projectMember/{projectKey}")
     public JsonResult getProjectMember(@PathVariable("projectKey") String projectKey){
+
         return projectService.getProjectMember(projectKey);
     }
 
@@ -56,6 +57,7 @@ public class ProjectController {
      * @return 修改成功
      */
     @PostMapping("/reviseRole")
+    @RequiresAuthentication
     public JsonResult reviseRole(@RequestBody ReviseRoleRequest reviseRoleRequest){
         UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
         return projectService.reviseRole(user,reviseRoleRequest);
@@ -67,6 +69,7 @@ public class ProjectController {
      * @return
      */
     @PostMapping("/deleteMember")
+    @RequiresAuthentication
     public JsonResult deleteMember(@RequestBody DeleteMemberRequest deleteMemberRequest){
         UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
         return projectService.deleteProjectMember(user,deleteMemberRequest);

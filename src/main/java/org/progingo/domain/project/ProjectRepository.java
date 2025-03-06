@@ -19,10 +19,9 @@ public interface ProjectRepository {
 
     boolean isEditor(String projectKey, String username);
 
-    int addMember(String projectKey, Set<String> addMemberSet);
-
     int findProjectMemberRole(String projectKey, String username);
+
     List<ProjectBO> findProjectByMemberUsername(String username);
-    boolean reviseRole(String projectKey, String username, Integer role);
+
     int deleteMember(String projectKey, Set<String> deleteMemberSet);
 }

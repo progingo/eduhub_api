@@ -25,11 +25,6 @@ public class Project implements Serializable {
     private String projectName;
 
     /**
-     * 所属人的username
-     */
-    private String possessorUsername;
-
-    /**
      * 公开0/私有1
      */
     private Boolean isPrivate;
