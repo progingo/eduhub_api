@@ -188,12 +188,19 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         AtomicInteger num = new AtomicInteger();
         deleteMemberSet.forEach(x ->{
            if (userRepository.haveUser(x)){
+               //伪删除，其实为修改is_delete字段为true
+               ProjectMember projectMember = ProjectMember.builder()
+                       .projectKey(projectKey)
+                       .username(x)
+                       .isDelete(true)
+                       .gmtUpdate(new Date())
+                       .build();
                ProjectMemberExample projectMemberExample = new ProjectMemberExample();
                projectMemberExample.createCriteria()
                        .andProjectKeyEqualTo(projectKey)
-                       .andUsernameEqualTo(x)
-                       .andIsDeleteEqualTo(false);
-               num.addAndGet(projectMemberDao.deleteByExample(projectMemberExample));
+                       .andUsernameEqualTo(x);
+               num.addAndGet(projectMemberDao.updateByExampleSelective(projectMember, projectMemberExample));
+//               num.addAndGet(projectMemberDao.deleteByExample(projectMemberExample));
            }
         });
         return num.get();

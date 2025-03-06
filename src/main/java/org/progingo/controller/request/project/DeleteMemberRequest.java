@@ -8,6 +8,5 @@ import java.util.List;
 public class DeleteMemberRequest {
     private String projectKey;
     List<String> usernameList;
-    boolean isDelete ;
 
 }

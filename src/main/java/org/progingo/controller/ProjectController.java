@@ -45,7 +45,7 @@ public class ProjectController {
      * @param projectKey 项目key
      * @return 项目成员
      */
-    @GetMapping("/{projectKey}")
+    @GetMapping("/projectMember/{projectKey}")
     public JsonResult getProjectMember(@PathVariable("projectKey") String projectKey){
         return projectService.getProjectMember(projectKey);
     }
