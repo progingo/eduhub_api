@@ -1,9 +1,7 @@
 package org.progingo.infrastructure.resource;
 
-import org.progingo.dao.ProjectDao;
 import org.progingo.dao.ProjectMemberDao;
 import org.progingo.dao.ResourceDao;
-import org.progingo.domain.project.ProjectExample;
 import org.progingo.domain.project.ProjectMemberExample;
 import org.progingo.domain.project.ProjectMemberRole;
 import org.progingo.domain.resource.Resource;

@@ -1,10 +1,6 @@
 package org.progingo.infrastructure.resource;
 
 import org.progingo.controller.request.resource.CreateResourceRequest;
-import org.progingo.dao.ProjectDao;
-import org.progingo.domain.project.Project;
-import org.progingo.domain.project.ProjectExample;
-import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.resource.ResourceType;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.ResultCode;

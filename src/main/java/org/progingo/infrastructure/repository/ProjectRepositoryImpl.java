@@ -1,6 +1,5 @@
 package org.progingo.infrastructure.repository;
 
-import org.progingo.controller.vo.ProjectMemberInfoVO;
 import org.progingo.dao.ProjectDao;
 import org.progingo.dao.ProjectMemberDao;
 import org.progingo.domain.project.*;
@@ -26,6 +25,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Autowired
     private ProjectMemberDao projectMemberDao;
 
+
     @Override
     public boolean save(Project project) {
         project.setGmtCreate(new Date());
@@ -35,15 +35,20 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     @Override
     public List<ProjectBO> findProjectByPossessorUsername(String username) {
-        ProjectExample projectExample = new ProjectExample();
-        projectExample.createCriteria()
-                .andPossessorUsernameEqualTo(username)
-                .andIsDeleteEqualTo(false);
-        projectExample.setOrderByClause("gmt_create desc");
-        List<ProjectBO> projectBOList = projectDao.selectByExample(projectExample)
-                .stream()
-                .map(x -> projectAdapter.toBO(x))
-                .collect(Collectors.toList());
+
+        ProjectMemberExample projectMemberExample = new ProjectMemberExample();
+        projectMemberExample.createCriteria()
+                .andUsernameEqualTo(username)
+                .andRoleEqualTo(ProjectMemberRole.MASTER.getCode());
+        projectMemberExample.setOrderByClause("gmt_create desc");
+
+        List<ProjectMember> projectMembers = projectMemberDao.selectByExample(projectMemberExample);
+        List<ProjectBO> projectBOList = projectMembers.stream().map(x ->{
+            ProjectExample projectExample = new ProjectExample();
+            projectExample.createCriteria().andKeyEqualTo(x.getProjectKey());
+            Project project = projectDao.selectByExample(projectExample).stream().findFirst().orElse(null);
+            return projectAdapter.toBO(project);
+        }).collect(Collectors.toList());
 
         return projectBOList;
     }
@@ -57,9 +62,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         if (project == null){
             return Collections.emptyList();
         }
-        LinkedList<UserBO> memberList = new LinkedList<>();
-        //项目创建人
-        memberList.add(userRepository.findUserByUsername(project.getPossessorUsername()));
+
         //项目成员
         ProjectMemberExample projectMemberExample = new ProjectMemberExample();
         projectMemberExample.createCriteria()
@@ -70,28 +73,22 @@ public class ProjectRepositoryImpl implements ProjectRepository {
                 .stream()
                 .map(x -> userRepository.findUserByUsername(x.getUsername()))
                 .collect(Collectors.toList());
-        memberList.addAll(members);
 
-        return memberList;
+        return members;
     }
 
     @Override
     public boolean isAdmin(String projectKey, String username) {
-        ProjectExample projectExample = new ProjectExample();
-        projectExample.createCriteria()
-                .andPossessorUsernameEqualTo(username)
-                .andKeyEqualTo(projectKey);
-        long projectNumber = projectDao.countByExample(projectExample);
 
         ProjectMemberExample projectMemberExample = new ProjectMemberExample();
         projectMemberExample.createCriteria()
                 .andProjectKeyEqualTo(projectKey)
                 .andUsernameEqualTo(username)
-                .andRoleEqualTo(ProjectMemberRole.ADMIN.getCode())
+                .andRoleBetween(ProjectMemberRole.ADMIN.getCode(), ProjectMemberRole.MASTER.getCode())
                 .andIsDeleteEqualTo(false);
         long projectMemberNumber = projectMemberDao.countByExample(projectMemberExample);
 
-        return projectNumber + projectMemberNumber > 0;
+        return projectMemberNumber > 0;
     }
 
     /**
@@ -102,39 +99,19 @@ public class ProjectRepositoryImpl implements ProjectRepository {
      */
     @Override
     public boolean isEditor(String projectKey, String username) {
-        ProjectExample projectExample = new ProjectExample();
-        projectExample.createCriteria()
-                .andPossessorUsernameEqualTo(username)
-                .andKeyEqualTo(projectKey);
-        long projectNumber = projectDao.countByExample(projectExample);
-
         ProjectMemberExample projectMemberExample = new ProjectMemberExample();
         projectMemberExample.createCriteria()
                 .andProjectKeyEqualTo(projectKey)
                 .andUsernameEqualTo(username)
-                .andRoleEqualTo(ProjectMemberRole.ADMIN.getCode())
+                .andRoleBetween(ProjectMemberRole.MEMBER.getCode(), ProjectMemberRole.MASTER.getCode())
                 .andIsDeleteEqualTo(false);
-
-        projectMemberExample.or()
-                .andProjectKeyEqualTo(projectKey)
-                .andUsernameEqualTo(username)
-                .andRoleEqualTo(ProjectMemberRole.MEMBER.getCode())
-                .andIsDeleteEqualTo(false);
-
         long projectMemberNumber = projectMemberDao.countByExample(projectMemberExample);
-
-        return projectNumber + projectMemberNumber > 0;
+        return projectMemberNumber > 0;
     }
 
 
     @Override
     public boolean isMember(String projectKey, String username) {
-        ProjectExample projectExample = new ProjectExample();
-        projectExample.createCriteria()
-                .andPossessorUsernameEqualTo(username)
-                .andKeyEqualTo(projectKey);
-        long projectNumber = projectDao.countByExample(projectExample);
-
         ProjectMemberExample projectMemberExample = new ProjectMemberExample();
         projectMemberExample.createCriteria()
                 .andProjectKeyEqualTo(projectKey)
@@ -142,45 +119,22 @@ public class ProjectRepositoryImpl implements ProjectRepository {
                 .andIsDeleteEqualTo(false);
 
         long projectMemberNumber = projectMemberDao.countByExample(projectMemberExample);
-        return projectNumber + projectMemberNumber > 0;
+        return projectMemberNumber > 0;
     }
 
-    @Override
-    public int addMember(String projectKey, Set<String> addMemberSet) {
-        AtomicInteger num = new AtomicInteger();
-        addMemberSet.forEach(x ->{
-            if (userRepository.haveUser(x)){
-                ProjectMember projectMember = ProjectMember.builder()
-                        .projectKey(projectKey)
-                        .username(x)
-                        .role(ProjectMemberRole.ONLY_READ_MEMBER.getCode())
-                        .isDelete(false)
-                        .gmtCreate(new Date())
-                        .gmtUpdate(new Date())
-                        .build();
-                num.addAndGet(projectMemberDao.insert(projectMember));
-            }
-
-        });
-        return num.get();
-    }
 
     @Override
     public int findProjectMemberRole(String projectKey, String username) {
-        ProjectExample projectExample = new ProjectExample();
-        projectExample.createCriteria()
-                .andPossessorUsernameEqualTo(username)
-                .andKeyEqualTo(projectKey);
-        long projectNumber = projectDao.countByExample(projectExample);
-        if (projectNumber > 0){
-            return ProjectMemberRole.MASTER.getCode();
-        }
+
         ProjectMemberExample projectMemberExample = new ProjectMemberExample();
         projectMemberExample.createCriteria()
                 .andProjectKeyEqualTo(projectKey)
                 .andUsernameEqualTo(username)
                 .andIsDeleteEqualTo(false);
-        return Objects.requireNonNull(projectMemberDao.selectByExample(projectMemberExample).stream().findFirst().orElse(null)).getRole();
+
+        ProjectMember projectMember = projectMemberDao.selectByExample(projectMemberExample).stream().findFirst().orElse(null);
+
+        return projectMember.getRole();
     }
 
     @Override
@@ -226,16 +180,5 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
         return projectBOList;
     }
-
-    @Override
-    public boolean reviseRole(String projectKey, String username, Integer role) {
-        ProjectMemberExample projectMemberExample = new ProjectMemberExample();
-        projectMemberExample.createCriteria()
-                .andProjectKeyEqualTo(projectKey)
-                .andUsernameEqualTo(username)
-                .andIsDeleteEqualTo(false);
-        return projectMemberDao.updateByExampleSelective(ProjectMember.builder().role(role).gmtUpdate(new Date()).build(), projectMemberExample) > 0;
-    }
-
 
 }

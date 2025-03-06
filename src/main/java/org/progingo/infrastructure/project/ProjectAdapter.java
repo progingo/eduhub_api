@@ -15,7 +15,6 @@ public class ProjectAdapter {
                 .id(project.getId())
                 .key(project.getKey())
                 .projectName(project.getProjectName())
-                .possessorUsername(project.getPossessorUsername())
                 .isPrivate(project.getIsPrivate())
                 .isDelete(project.getIsDelete())
                 .gmtCreate(project.getGmtCreate())

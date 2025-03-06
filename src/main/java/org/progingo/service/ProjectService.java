@@ -1,6 +1,5 @@
 package org.progingo.service;
 
-import cn.hutool.core.util.BooleanUtil;
 import org.progingo.application.ProjectApp;
 import org.progingo.controller.request.project.AddMemberRequest;
 import org.progingo.controller.request.project.CreateProjectRequest;
@@ -8,22 +7,19 @@ import org.progingo.controller.request.project.DeleteMemberRequest;
 import org.progingo.controller.request.project.ReviseRoleRequest;
 
 import org.progingo.controller.vo.ProjectMemberInfoVO;
-import org.progingo.dao.UserDao;
 import org.progingo.domain.project.Project;
+import org.progingo.domain.project.ProjectMemberRole;
 import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.UserBO;
-import org.progingo.domain.user.UserExample;
 import org.progingo.infrastructure.project.ProjectHelper;
 import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class ProjectService {
@@ -34,15 +30,13 @@ public class ProjectService {
     private ProjectApp projectApp;
     @Autowired
     private ProjectRepository projectRepository;
-    @Autowired
-    private UserDao userDao;
 
     public JsonResult createProject(UserBO user, CreateProjectRequest createProjectRequest) {
-        String username = user.getUsername();
-        if (username.isEmpty()){
+
+        if (user.isTourist()){
             return JsonResult.ok(401,"请重新登陆");
         }
-        System.out.println(createProjectRequest.getIsPrivate().equals(1));
+
         Project project = Project.builder()
                 .projectName(createProjectRequest.getProjectName())
                 .isPrivate(createProjectRequest.getIsPrivate().equals(1))
@@ -53,9 +47,7 @@ public class ProjectService {
             return JsonResult.fail(checkActionResult.getMsg());
         }
 
-        project.setPossessorUsername(username);
-
-        ActionResult result = projectApp.createProject(project);
+        ActionResult result = projectApp.createProject(user, project);
         if (!result.isSuccess()){
             return JsonResult.fail(result.getMsg());
         }
@@ -126,7 +118,7 @@ public class ProjectService {
     public JsonResult reviseRole(UserBO user, ReviseRoleRequest reviseRoleRequest) {
         String username = user.getUsername();
         String projectKey = reviseRoleRequest.getProjectKey();
-        if (username.isEmpty()){
+        if (user.isTourist()){
             return JsonResult.ok(401,"请重新登陆");
         }
         if (!projectRepository.isAdmin(projectKey, username)){
@@ -135,8 +127,9 @@ public class ProjectService {
         if (!projectRepository.isMember(projectKey, reviseRoleRequest.getUsername())){
             return JsonResult.fail("成员不存在");
         }
-        ActionResult actionResult = projectApp.reviseRole(user,projectKey,
-                reviseRoleRequest.getUsername(), reviseRoleRequest.getRole());
+        ActionResult actionResult = projectApp.reviseRole(projectKey,
+                reviseRoleRequest.getUsername(), ProjectMemberRole.getByCode(reviseRoleRequest.getRole()));
+
         if (!actionResult.isSuccess()){
             return JsonResult.fail(actionResult.getMsg());
         }
