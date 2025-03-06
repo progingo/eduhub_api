@@ -2,6 +2,7 @@ package org.progingo.application;
 
 
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.progingo.controller.vo.UserInfoVO;
 import org.progingo.dao.UserDao;
 import org.progingo.domain.user.*;
 import org.progingo.infrastructure.repository.UserAdapter;
@@ -10,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class UserApp {
@@ -71,5 +74,9 @@ public class UserApp {
         userRepository.updateUser(user);
         tokenUtil.deleteIdToken(user.getId());
         return ActionResult.ok();
+    }
+
+    public List<UserBO> getUserInfoByNickName(String nickName) {
+        return userRepository.findUserByNickName(nickName);
     }
 }

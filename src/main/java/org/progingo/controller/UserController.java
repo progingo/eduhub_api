@@ -60,4 +60,10 @@ public class UserController {
         UserBO user = (UserBO)SecurityUtils.getSubject().getPrincipal();
         return userService.getJoinProject(user);
     }
+
+    @GetMapping("/getUser/{nickName}")
+    public JsonResult getUserInfoByNickName(@PathVariable String nickName){
+        return userService.getUserInfoByNickName(nickName);
+
+    }
 }

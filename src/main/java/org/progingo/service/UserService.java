@@ -143,4 +143,14 @@ public class UserService {
                 .collect(Collectors.toList());
         return JsonResult.ok(projectVOList);
     }
+
+    public JsonResult getUserInfoByNickName(String nickName) {
+        List<UserBO> userList = userApp.getUserInfoByNickName(nickName);
+        List<UserInfoVO> userVOList = userList
+                .stream()
+                .map(x -> userAdapter.toVO(x))
+                .collect(Collectors.toList());
+        return JsonResult.ok(userVOList);
+
+    }
 }
