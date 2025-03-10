@@ -5,14 +5,16 @@ import org.progingo.application.PPTInfoApp;
 import org.progingo.application.ResourceApp;
 import org.progingo.controller.request.ppt.CreatePPTRequest;
 import org.progingo.controller.request.ppt.SavePPTRequest;
+import org.progingo.controller.vo.PPTInfoVO;
 import org.progingo.dao.PptInfoDao;
-import org.progingo.domain.ppt.PptInfo;
+import org.progingo.domain.ppt.*;
 import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.resource.ResourceRepository;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.ResultCode;
 import org.progingo.domain.user.UserBO;
 import org.progingo.domain.user.UserRepository;
+import org.progingo.infrastructure.ppt.PPTInfoAdapter;
 import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,10 @@ public class PPTService {
     private ResourceRepository resourceRepository;
     @Autowired
     private PPTInfoApp pptInfoApp;
+    @Autowired
+    private PPTRepository pptRepository;
+    @Autowired
+    private PPTInfoAdapter pptInfoAdapter;
 
     public void savePPT(SavePPTRequest savePPTRequest){
 
@@ -42,9 +48,19 @@ public class PPTService {
         pptInfoDao.insert(pptInfo);
     }
 
-    public String getPPT(Integer id){
-        PptInfo pptInfo = pptInfoDao.selectByPrimaryKey(id);
-        return pptInfo.getSlides();
+    public JsonResult getPPT(UserBO user, String key){
+        if (user.isTourist()){
+            return JsonResult.fail(401, "请重新登陆");
+        }
+
+        PPTInfoBO pptInfoBO = pptRepository.findPPTInfoByKey(key);
+        if (pptInfoBO == null || !pptInfoBO.getUsername().equals(user.getUsername()) || pptInfoBO.getState() != PPTState.NORMAL){
+            return JsonResult.fail(ResultCode.PPT_NOT_EXIST.getMsg());
+        }
+
+        PPTInfoVO pptVO = pptInfoAdapter.toVO(pptInfoBO);
+
+        return JsonResult.ok(pptVO);
     }
 
 

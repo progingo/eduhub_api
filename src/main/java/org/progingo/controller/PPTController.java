@@ -30,10 +30,11 @@ public class PPTController {
         pptService.savePPT(savePPTRequest);
     }
 
-    @GetMapping("{id}")
-    public JsonResult getPPT(@PathVariable("id") Integer id){
-        System.out.println(id);
-        return JsonResult.ok(pptService.getPPT(id));
+    @GetMapping("{key}")
+    @RequiresAuthentication
+    public JsonResult getPPT(@PathVariable("key") String key){
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+        return pptService.getPPT(user,key);
 
         /*return "[\n" +
                 "  {\n" +

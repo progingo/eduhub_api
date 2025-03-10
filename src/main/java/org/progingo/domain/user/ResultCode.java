@@ -17,6 +17,8 @@ public enum ResultCode {
     RESOURCE_NOT_EXITS("资源不存在"),
     NODE_NOT_EXIST("节点不存在"),
 
+    PPT_NOT_EXIST("PPT不存在")
+
     ;
 
     @Getter

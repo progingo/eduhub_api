@@ -1,5 +1,6 @@
 package org.progingo.infrastructure.ppt;
 
+import org.progingo.controller.vo.PPTInfoVO;
 import org.progingo.domain.ppt.PPTEntity;
 import org.progingo.domain.ppt.PPTInfoBO;
 import org.progingo.domain.ppt.PPTState;
@@ -31,5 +32,18 @@ public class PPTInfoAdapter {
                 .build();
 
         return pptInfoBO;
+    }
+
+    public PPTInfoVO toVO(PPTInfoBO pptInfoBO){
+        PPTInfoVO pptVO = PPTInfoVO.builder()
+                .title(pptInfoBO.getPptEntity().getTitle())
+                .slides(pptInfoBO.getPptEntity().getSlides())
+                .viewportratio(pptInfoBO.getPptEntity().getViewportratio())
+                .viewportsize(pptInfoBO.getPptEntity().getViewportsize())
+                .gmtCreate(pptInfoBO.getGmtCreate())
+                .gmtUpdate(pptInfoBO.getGmtUpdate())
+                .build();
+
+        return pptVO;
     }
 }
