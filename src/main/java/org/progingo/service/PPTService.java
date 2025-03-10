@@ -1,8 +1,10 @@
 package org.progingo.service;
 
 import com.alibaba.fastjson2.JSON;
+import org.progingo.application.PPTGitTreeApp;
 import org.progingo.application.PPTInfoApp;
 import org.progingo.application.ResourceApp;
+import org.progingo.controller.request.ppt.CommitPPTRequest;
 import org.progingo.controller.request.ppt.CreatePPTRequest;
 import org.progingo.controller.request.ppt.SavePPTRequest;
 import org.progingo.controller.vo.PPTInfoVO;
@@ -32,20 +34,34 @@ public class PPTService {
     private PPTRepository pptRepository;
     @Autowired
     private PPTInfoAdapter pptInfoAdapter;
+    @Autowired
+    private PPTGitTreeApp pptGitTreeApp;
+    @Autowired
+    private PPTGitTreeRepository pptGitTreeRepository;
 
-    public void savePPT(SavePPTRequest savePPTRequest){
-
+    public JsonResult savePPT(UserBO user, SavePPTRequest savePPTRequest){
+        if (user.isTourist()){
+            return JsonResult.fail(401, "请重新登陆");
+        }
         String jsonString = JSON.toJSONString(savePPTRequest.getSlides());
-        //System.out.println(jsonString);
+        PPTEntity pptEntity = new PPTEntity();
+        pptEntity.setTitle(savePPTRequest.getTitle());
+        pptEntity.setSlides(jsonString);
+        pptEntity.setViewportsize(savePPTRequest.getViewportSize());
+        pptEntity.setViewportratio(savePPTRequest.getViewportRatio());
 
-        PptInfo pptInfo = PptInfo.builder()
-                .title(savePPTRequest.getTitle())
-                .slides(jsonString)
-                .viewportsize(savePPTRequest.getViewportSize())
-                .viewportratio(savePPTRequest.getViewportRatio())
+        PPTInfoBO pptInfoBO = PPTInfoBO.builder()
+                .key(savePPTRequest.getKey())
+                .pptEntity(pptEntity)
                 .build();
 
-        pptInfoDao.insert(pptInfo);
+
+        ActionResult savePPTActionResult = pptInfoApp.updatePPT(user.getUsername(), pptInfoBO);
+
+        if (!savePPTActionResult.isSuccess()){
+            return JsonResult.fail(savePPTActionResult.getMsg());
+        }
+        return JsonResult.ok();
     }
 
     public JsonResult getPPT(UserBO user, String key){
@@ -80,6 +96,54 @@ public class PPTService {
         }
 
         return JsonResult.ok(createPPTActionResult.getMsg());
+
+    }
+
+    /*
+    提交ppt需要先保存PPT再提交成新节点
+     */
+    public JsonResult commitPPT(UserBO user, CommitPPTRequest commitPPTRequest) {
+        if (user.isTourist()){
+            return JsonResult.fail(401, "请重新登陆");
+        }
+        String jsonString = JSON.toJSONString(commitPPTRequest.getSlides());
+        PPTEntity pptEntity = new PPTEntity();
+        pptEntity.setTitle(commitPPTRequest.getTitle());
+        pptEntity.setSlides(jsonString);
+        pptEntity.setViewportsize(commitPPTRequest.getViewportSize());
+        pptEntity.setViewportratio(commitPPTRequest.getViewportRatio());
+
+        PPTInfoBO pptInfoBO = PPTInfoBO.builder()
+                .key(commitPPTRequest.getKey())
+                .pptEntity(pptEntity)
+                .build();
+
+
+        //保存成新的ppt
+        ActionResult savePPTActionResult = pptInfoApp.createPPT(user.getUsername(), pptInfoBO);
+
+        if (!savePPTActionResult.isSuccess()){
+            return JsonResult.fail(savePPTActionResult.getMsg());
+        }
+        String pptKey = savePPTActionResult.getMsg();
+
+        //新建节点
+
+
+        ActionResult createActionResult = pptGitTreeApp.createNode(user.getUsername(), commitPPTRequest.getKey(), pptKey, commitPPTRequest.getRemark());
+        if (!createActionResult.isSuccess()){
+            return JsonResult.fail(createActionResult.getMsg());
+        }
+
+        //初始化完成ppt
+
+        String nodeKey = createActionResult.getMsg();
+        ActionResult actionResult = pptInfoApp.finishInitPPT(pptKey, nodeKey);
+        if (!actionResult.isSuccess()){
+            return JsonResult.fail(actionResult.getMsg());
+        }
+
+        return JsonResult.ok();
 
     }
 }

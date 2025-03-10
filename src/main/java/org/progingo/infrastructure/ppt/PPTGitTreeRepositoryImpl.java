@@ -39,13 +39,29 @@ public class PPTGitTreeRepositoryImpl implements PPTGitTreeRepository {
         return pptGitTree.getPptKey();
     }
 
+
+    @Override
+    public String findResourceKeyByNodeKey(String nodeKey) {
+        PptGitTreeExample pptGitTreeExample = new PptGitTreeExample();
+        pptGitTreeExample.createCriteria()
+                .andKeyEqualTo(nodeKey)
+                .andIsDeleteEqualTo(false);
+        PptGitTree pptGitTree = pptGitTreeDao.selectByExample(pptGitTreeExample).stream().findFirst().orElse(null);
+        if (pptGitTree == null){
+            return null;
+        }
+        return pptGitTree.getResourceKey();
+    }
+
+
+
     private PptGitTree adapter(PptGitTreeBO pptGitTreeBO) {
         PptGitTree pptGitTree = new PptGitTree();
         pptGitTree.setId(pptGitTreeBO.getId());
         pptGitTree.setKey(pptGitTreeBO.getKey());
         pptGitTree.setRemark(pptGitTreeBO.getRemark());
         pptGitTree.setUsername(pptGitTreeBO.getUsername());
-       pptGitTree.setResourceKey(pptGitTreeBO.getResourceKey());
+        pptGitTree.setResourceKey(pptGitTreeBO.getResourceKey());
         pptGitTree.setPptKey(pptGitTreeBO.getPptKey());
         pptGitTree.setIsRoot(pptGitTreeBO.getIsRoot());
         pptGitTree.setOperation(pptGitTreeBO.getOperation().getCode());
