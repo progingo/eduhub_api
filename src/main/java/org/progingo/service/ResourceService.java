@@ -4,6 +4,7 @@ import org.progingo.application.PPTGitTreeApp;
 import org.progingo.application.PPTInfoApp;
 import org.progingo.application.ResourceApp;
 import org.progingo.controller.request.resource.CreateResourceRequest;
+import org.progingo.controller.request.resource.GetResourceListRequest;
 import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.resource.Resource;
 import org.progingo.domain.resource.ResourceType;
@@ -31,6 +32,12 @@ public class ResourceService {
     @Autowired
     private PPTGitTreeApp pptGitTreeApp;
 
+    /**
+     * 创建资源
+     * @param user  当前用户
+     * @param createResourceRequest  创建资源请求
+     * @return
+     */
     public JsonResult createResource(UserBO user, CreateResourceRequest createResourceRequest) {
         if (user.isTourist()){
             return JsonResult.fail(401, "请重新登陆");
@@ -91,4 +98,21 @@ public class ResourceService {
 
 
     }
+
+    /**
+     * 获取资源列表
+     */
+//    public JsonResult  getResourceList(UserBO user, GetResourceListRequest getResourceListRequest) {
+//        if (user.isTourist()){
+//            return JsonResult.fail(401, "请重新登陆");
+//        }
+//        if (getResourceListRequest.getProjectKey() == null){
+//            return JsonResult.fail("请输入项目key");
+//        }
+//        if (!projectRepository.isMember(getResourceListRequest.getProjectKey(), user.getUsername())){
+//            return JsonResult.fail(ResultCode.PERMISSION_DENIED.getMsg());
+//        }
+//        return JsonResult.ok(resourceApp.getResourceList(getResourceListRequest.getProjectKey()));
+//
+//    }
 }

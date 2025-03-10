@@ -102,6 +102,7 @@ public class ProjectService {
                     .nickName(x.getNickname())
                     .profilePhoto(x.getProfilePhoto())
                     .role(projectRepository.findProjectMemberRole(projectKey, x.getUsername()))
+                    .username(x.getUsername())
                     .build();
         }).collect(Collectors.toList());
         if (projectMemberInfoVOList.isEmpty()){

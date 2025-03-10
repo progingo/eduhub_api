@@ -10,6 +10,7 @@ public class ProjectMemberInfoVO {
     private String nickName;
     private String profilePhoto;
     private Integer role;
+    private String username;
 
 
 }
