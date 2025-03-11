@@ -76,4 +76,42 @@ public class PPTInfoApp {
 
     }
 
+    public ActionResult updatePPT(String username, PPTInfoBO pptInfoBO) {
+        PPTInfoBO pptInfo = pptRepository.findPPTInfoByKey(pptInfoBO.getKey());
+        if (pptInfo == null || !pptInfo.getUsername().equals(username)){
+            return ActionResult.fail(ResultCode.PPT_NOT_EXIST);
+        }
+        pptInfo.setPptEntity(pptInfoBO.getPptEntity());
+
+        boolean r = pptRepository.updatePPTInfo(pptInfo);
+        if (!r){
+            return ActionResult.fail("保存失败");
+        }
+        return ActionResult.ok();
+
+    }
+
+    public ActionResult createPPT(String username, PPTInfoBO pptInfoBO) {
+        PPTInfoBO pptInfo = pptRepository.findPPTInfoByKey(pptInfoBO.getKey());
+        if (pptInfo == null || !pptInfo.getUsername().equals(username)){
+            return ActionResult.fail(ResultCode.PPT_NOT_EXIST);
+        }
+
+        String key = UUID.randomUUID().toString().replaceAll("-", "");
+
+        pptInfo.setPptEntity(pptInfoBO.getPptEntity());
+        pptInfo.setNodeKey("");
+        pptInfo.setUsername(username);
+        pptInfo.setState(PPTState.CREAET);
+        pptInfo.setKey(key);
+
+        boolean res = pptRepository.addPPTInfo(pptInfo);
+
+        if (!res) {
+            return ActionResult.fail("新建PPT失败");
+        }
+
+        return ActionResult.ok(key);
+
+    }
 }
