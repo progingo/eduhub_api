@@ -4,6 +4,7 @@ import org.progingo.application.ProjectApp;
 import org.progingo.controller.request.project.*;
 
 import org.progingo.controller.vo.ProjectMemberInfoVO;
+import org.progingo.controller.vo.ProjectSetUpVO;
 import org.progingo.domain.project.Project;
 import org.progingo.domain.project.ProjectBO;
 import org.progingo.domain.project.ProjectMemberRole;
@@ -97,6 +98,16 @@ public class ProjectService {
         return JsonResult.ok(actionResult.getMsg());
     }
 
+    public JsonResult getProjectSetUp(UserBO user, String projectKey){
+        if (user.isTourist()){
+            return JsonResult.ok(401,"请重新登陆");
+        }
+        if (!projectRepository.isMember(projectKey, user.getUsername())){
+            return JsonResult.fail("您不是该项目成员，无法查看项目设置");
+        }
+        ProjectSetUpVO projectSetUp =  projectRepository.findProjectByProjectKey(projectKey);
+        return JsonResult.ok(projectSetUp);
+    }
     public JsonResult addMember(UserBO user, AddMemberRequest addMemberRequest) {
         List<UserBO> projectMemberList = projectRepository.findProjectMember(addMemberRequest.getProjectKey());
         Set<String> projectMemberIdSet = projectMemberList.stream().map(UserBO::getUsername).collect(Collectors.toSet());

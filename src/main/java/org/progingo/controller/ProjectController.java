@@ -43,6 +43,18 @@ public class ProjectController {
     }
 
     /**
+     * 获取项目设置信息
+     * @param projectKey
+     * @return
+     */
+    @GetMapping("/getProjectSetUp/{projectKey}")
+    @RequiresAuthentication
+    public JsonResult getProjectSetUp(@PathVariable String projectKey) {
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+        return projectService.getProjectSetUp(user, projectKey);
+    }
+
+    /**
      * 添加项目成员
      * @param addMemberRequest
      * @return

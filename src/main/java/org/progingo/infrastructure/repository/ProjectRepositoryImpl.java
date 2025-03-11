@@ -1,5 +1,6 @@
 package org.progingo.infrastructure.repository;
 
+import org.progingo.controller.vo.ProjectSetUpVO;
 import org.progingo.dao.ProjectDao;
 import org.progingo.dao.ProjectMemberDao;
 import org.progingo.domain.project.*;
@@ -191,6 +192,22 @@ public class ProjectRepositoryImpl implements ProjectRepository {
             return 1;
         }
         return 0;
+    }
+
+    @Override
+    public ProjectSetUpVO findProjectByProjectKey(String projectKey) {
+        ProjectExample projectExample = new ProjectExample();
+        projectExample.createCriteria()
+                .andKeyEqualTo(projectKey)
+                .andIsDeleteEqualTo(false);
+        Project project = projectDao.selectByExample(projectExample).stream().findFirst().orElse(null);
+        if (project != null){
+            return ProjectSetUpVO.builder()
+                    .projectName(project.getProjectName())
+                    .isPrivate(project.getIsPrivate())
+                    .build();
+        }
+        return null;
     }
 
     @Override
