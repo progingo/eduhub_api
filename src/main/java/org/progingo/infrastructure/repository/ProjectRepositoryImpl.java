@@ -1,5 +1,6 @@
 package org.progingo.infrastructure.repository;
 
+import org.progingo.controller.vo.ProjectSetUpVO;
 import org.progingo.dao.ProjectDao;
 import org.progingo.dao.ProjectMemberDao;
 import org.progingo.domain.project.*;
@@ -160,6 +161,55 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         });
         return num.get();
     }
+
+    /**
+     * 删除项目，伪删除，修改is_delete字段为true
+     * @param projectKey 项目key
+     * @return
+     */
+    @Override
+    public int deleteProject(String projectKey) {
+        ProjectExample projectExample = new ProjectExample();
+        projectExample.createCriteria()
+                .andKeyEqualTo(projectKey)
+                .andIsDeleteEqualTo(false);
+        return projectDao.updateByExampleSelective(Project.builder().isDelete(true).build(), projectExample);
+    }
+
+    /**
+     * 修改项目信息
+     * @param projectBO 项目信息
+     * @return
+     */
+    @Override
+    public int reviseProject(ProjectBO projectBO) {
+
+        ProjectExample projectExample = new ProjectExample();
+        projectExample.createCriteria()
+                .andKeyEqualTo(projectBO.getKey())
+                .andIsDeleteEqualTo(false);
+        if (projectDao.updateByExampleSelective(projectAdapter.toDomain(projectBO), projectExample) > 0){
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public ProjectSetUpVO findProjectByProjectKey(String projectKey) {
+        ProjectExample projectExample = new ProjectExample();
+        projectExample.createCriteria()
+                .andKeyEqualTo(projectKey)
+                .andIsDeleteEqualTo(false);
+        Project project = projectDao.selectByExample(projectExample).stream().findFirst().orElse(null);
+        if (project != null){
+            return ProjectSetUpVO.builder()
+                    .projectName(project.getProjectName())
+                    .isPrivate(project.getIsPrivate())
+                    .build();
+        }
+        return null;
+    }
+
     @Override
     public List<ProjectBO> findProjectByMemberUsername(String username) {
         ProjectMemberExample projectMemberExample = new ProjectMemberExample();

@@ -5,8 +5,10 @@ import org.progingo.application.PPTInfoApp;
 import org.progingo.application.ResourceApp;
 import org.progingo.controller.request.resource.CreateResourceRequest;
 import org.progingo.controller.request.resource.GetResourceListRequest;
+import org.progingo.controller.vo.ResourceVO;
 import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.resource.Resource;
+import org.progingo.domain.resource.ResourceRepository;
 import org.progingo.domain.resource.ResourceType;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.ResultCode;
@@ -16,6 +18,8 @@ import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -31,6 +35,9 @@ public class ResourceService {
     private PPTInfoApp pptInfoApp;
     @Autowired
     private PPTGitTreeApp pptGitTreeApp;
+
+    @Autowired
+    private ResourceRepository resourceRepository;
 
     /**
      * 创建资源
@@ -102,17 +109,41 @@ public class ResourceService {
     /**
      * 获取资源列表
      */
-//    public JsonResult  getResourceList(UserBO user, GetResourceListRequest getResourceListRequest) {
-//        if (user.isTourist()){
-//            return JsonResult.fail(401, "请重新登陆");
-//        }
-//        if (getResourceListRequest.getProjectKey() == null){
-//            return JsonResult.fail("请输入项目key");
-//        }
-//        if (!projectRepository.isMember(getResourceListRequest.getProjectKey(), user.getUsername())){
-//            return JsonResult.fail(ResultCode.PERMISSION_DENIED.getMsg());
-//        }
-//        return JsonResult.ok(resourceApp.getResourceList(getResourceListRequest.getProjectKey()));
-//
-//    }
+    public JsonResult getResourceList(UserBO user, GetResourceListRequest getResourceListRequest) {
+        if (user.isTourist()) {
+            return JsonResult.fail(401, "请重新登陆");
+        }
+
+        if (getResourceListRequest.getProjectKey() == null) {
+            return JsonResult.fail("项目为空");
+        }
+
+        boolean isMember = projectRepository.isMember(getResourceListRequest.getProjectKey(), user.getUsername());
+        if (!isMember) {
+            return JsonResult.fail(ResultCode.PERMISSION_DENIED.getMsg());
+        }
+
+        // 根据用户是否为项目成员决定是否获取私有资源
+        List<ResourceVO> resourceList = resourceRepository.getResourceList(
+                getResourceListRequest.getProjectKey(),
+                isMember // 如果是成员，获取所有资源；否则只获取非私有资源
+        );
+
+        return JsonResult.ok(resourceList);
+    }
+
+    /**
+     * 删除资源(伪删除)
+     */
+    public JsonResult deleteResource(UserBO user, String resourceKey) {
+        if (user.isTourist()) {
+            return JsonResult.fail(401, "请重新登陆");
+        }
+        ActionResult actionResult = resourceApp.deleteResource(resourceKey, user);
+        if (!actionResult.isSuccess()) {
+            return JsonResult.fail(actionResult.getMsg());
+        }
+        return JsonResult.ok(actionResult.getMsg());
+    }
+
 }

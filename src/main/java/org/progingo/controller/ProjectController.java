@@ -2,10 +2,7 @@ package org.progingo.controller;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.progingo.controller.request.project.AddMemberRequest;
-import org.progingo.controller.request.project.CreateProjectRequest;
-import org.progingo.controller.request.project.DeleteMemberRequest;
-import org.progingo.controller.request.project.ReviseRoleRequest;
+import org.progingo.controller.request.project.*;
 
 import org.progingo.dao.ProjectMemberDao;
 import org.progingo.domain.project.ProjectMember;
@@ -33,6 +30,35 @@ public class ProjectController {
         return projectService.createProject(user,createProjectRequest);
     }
 
+    /**
+     * 删除项目
+     * @param deleteProjectRequest
+     * @return
+     */
+    @PostMapping("/delete")
+    @RequiresAuthentication
+    public JsonResult deleteProject(@RequestBody DeleteProjectRequest deleteProjectRequest){
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+        return projectService.deleteProject(user, deleteProjectRequest.getProjectKey());
+    }
+
+    /**
+     * 获取项目设置信息
+     * @param projectKey
+     * @return
+     */
+    @GetMapping("/getProjectSetUp/{projectKey}")
+    @RequiresAuthentication
+    public JsonResult getProjectSetUp(@PathVariable String projectKey) {
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+        return projectService.getProjectSetUp(user, projectKey);
+    }
+
+    /**
+     * 添加项目成员
+     * @param addMemberRequest
+     * @return
+     */
     @PostMapping("/addMember")
     @RequiresAuthentication
     public JsonResult addMember(@RequestBody AddMemberRequest addMemberRequest){
@@ -51,6 +77,17 @@ public class ProjectController {
         return projectService.getProjectMember(projectKey);
     }
 
+    /**
+     * 修改项目信息
+     * @param reviseProjectRequest
+     * @return
+     */
+    @PostMapping("/reviseProject")
+    @RequiresAuthentication
+    public JsonResult reviseProject(@RequestBody ReviseProjectRequest reviseProjectRequest){
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+        return projectService.reviseProject(user,reviseProjectRequest);
+    }
     /**
      * 修改项目角色
      * @param reviseRoleRequest 修改角色请求

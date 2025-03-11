@@ -1,13 +1,12 @@
 package org.progingo.service;
 
 import org.progingo.application.ProjectApp;
-import org.progingo.controller.request.project.AddMemberRequest;
-import org.progingo.controller.request.project.CreateProjectRequest;
-import org.progingo.controller.request.project.DeleteMemberRequest;
-import org.progingo.controller.request.project.ReviseRoleRequest;
+import org.progingo.controller.request.project.*;
 
 import org.progingo.controller.vo.ProjectMemberInfoVO;
+import org.progingo.controller.vo.ProjectSetUpVO;
 import org.progingo.domain.project.Project;
+import org.progingo.domain.project.ProjectBO;
 import org.progingo.domain.project.ProjectMemberRole;
 import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.user.ActionResult;
@@ -55,6 +54,60 @@ public class ProjectService {
         return JsonResult.ok(result.getMsg());
     }
 
+    /**
+     * 删除项目
+     * @param user
+     * @param projectKey
+     * @return
+     */
+    public JsonResult deleteProject(UserBO user, String projectKey) {
+        if (user.isTourist()){
+            return JsonResult.ok(401,"请重新登陆");
+        }
+        ActionResult actionResult = projectApp.deleteProject(user, projectKey);
+        if (!actionResult.isSuccess()){
+            return JsonResult.fail(actionResult.getMsg());
+        }
+        return JsonResult.ok(actionResult.getMsg());
+    }
+
+    /**
+     * 修改项目
+     * @param user
+     * @param reviseProjectRequest
+     * @return
+     */
+    public JsonResult reviseProject(UserBO user, ReviseProjectRequest reviseProjectRequest) {
+        String projectKey = reviseProjectRequest.getProjectKey();
+        if (user.isTourist()){
+            return JsonResult.ok(401,"请重新登陆");
+        }
+        if (!projectRepository.isAdmin(projectKey, user.getUsername())){
+            return JsonResult.fail("您不是该项目管理员，无法修改项目");
+        }
+        // 把reviseRoleRequest转为ProjectBO
+        ProjectBO projectBO = ProjectBO.builder()
+                .key(reviseProjectRequest.getProjectKey())
+                .projectName(reviseProjectRequest.getProjectName())
+                .isPrivate(reviseProjectRequest.getIsPrivate().equals(1))
+                .build();
+        ActionResult actionResult = projectApp.reviseProject(user, projectBO);
+        if (!actionResult.isSuccess()){
+            return JsonResult.fail(actionResult.getMsg());
+        }
+        return JsonResult.ok(actionResult.getMsg());
+    }
+
+    public JsonResult getProjectSetUp(UserBO user, String projectKey){
+        if (user.isTourist()){
+            return JsonResult.ok(401,"请重新登陆");
+        }
+        if (!projectRepository.isMember(projectKey, user.getUsername())){
+            return JsonResult.fail("您不是该项目成员，无法查看项目设置");
+        }
+        ProjectSetUpVO projectSetUp =  projectRepository.findProjectByProjectKey(projectKey);
+        return JsonResult.ok(projectSetUp);
+    }
     public JsonResult addMember(UserBO user, AddMemberRequest addMemberRequest) {
         List<UserBO> projectMemberList = projectRepository.findProjectMember(addMemberRequest.getProjectKey());
         Set<String> projectMemberIdSet = projectMemberList.stream().map(UserBO::getUsername).collect(Collectors.toSet());

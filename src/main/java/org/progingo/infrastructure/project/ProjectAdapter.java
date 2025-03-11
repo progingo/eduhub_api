@@ -30,4 +30,15 @@ public class ProjectAdapter {
                 .isPrivate(projectBO.getIsPrivate())
                 .build();
     }
+    public Project toDomain(ProjectBO projectBO){
+        Project build = Project.builder()
+                .id(projectBO.getId())
+                .key(projectBO.getKey())
+                .projectName(projectBO.getProjectName())
+                .isPrivate(projectBO.getIsPrivate())
+                .isDelete(projectBO.getIsDelete())
+                .gmtCreate(projectBO.getGmtCreate())
+                .build();
+        return build;
+    }
 }
