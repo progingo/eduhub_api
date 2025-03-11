@@ -160,6 +160,39 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         });
         return num.get();
     }
+
+    /**
+     * 删除项目，伪删除，修改is_delete字段为true
+     * @param projectKey 项目key
+     * @return
+     */
+    @Override
+    public int deleteProject(String projectKey) {
+        ProjectExample projectExample = new ProjectExample();
+        projectExample.createCriteria()
+                .andKeyEqualTo(projectKey)
+                .andIsDeleteEqualTo(false);
+        return projectDao.updateByExampleSelective(Project.builder().isDelete(true).build(), projectExample);
+    }
+
+    /**
+     * 修改项目信息
+     * @param projectBO 项目信息
+     * @return
+     */
+    @Override
+    public int reviseProject(ProjectBO projectBO) {
+
+        ProjectExample projectExample = new ProjectExample();
+        projectExample.createCriteria()
+                .andKeyEqualTo(projectBO.getKey())
+                .andIsDeleteEqualTo(false);
+        if (projectDao.updateByExampleSelective(projectAdapter.toDomain(projectBO), projectExample) > 0){
+            return 1;
+        }
+        return 0;
+    }
+
     @Override
     public List<ProjectBO> findProjectByMemberUsername(String username) {
         ProjectMemberExample projectMemberExample = new ProjectMemberExample();

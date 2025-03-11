@@ -1,5 +1,6 @@
 package org.progingo.application;
 
+import org.progingo.controller.request.project.ReviseRoleRequest;
 import org.progingo.domain.project.*;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.ResultCode;
@@ -37,6 +38,30 @@ public class ProjectApp {
         return ActionResult.ok(project.getKey());
     }
 
+    public ActionResult deleteProject(UserBO user, String projectKey) {
+        //判断是否为项目成员
+        if (!projectRepository.isMember(projectKey, user.getUsername())){
+            return ActionResult.fail(ResultCode.PERMISSION_DENIED);
+        }
+        //判断是否为管理员或创建者
+        if (!projectRepository.isAdmin(projectKey, user.getUsername())){
+            return ActionResult.fail(ResultCode.PERMISSION_DENIED);
+        }
+        if (projectRepository.deleteProject(projectKey) < 1){
+            return ActionResult.fail("删除失败");
+        }
+        return ActionResult.ok("删除成功");
+    }
+
+    public ActionResult reviseProject(UserBO user, ProjectBO projectBO) {
+        if (user.isTourist()){
+            return ActionResult.fail(ResultCode.PERMISSION_DENIED);
+        }
+        if (projectRepository.reviseProject(projectBO) < 1){
+            return ActionResult.fail("修改失败");
+        }
+        return ActionResult.ok("修改成功");
+    }
     public ActionResult addProjectMember(UserBO user, String projectKey, Set<String> addMemberSet) {
         if (user.isTourist()){
             return ActionResult.fail(ResultCode.PERMISSION_DENIED);
