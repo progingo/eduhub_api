@@ -79,6 +79,18 @@ public class UserService {
         return JsonResult.ok(userVO);
     }
 
+    public JsonResult getUserInfoByUsername(UserBO user,String username) {
+        if (user == null){
+            return JsonResult.fail(401,"请重新登陆");
+        }
+        UserBO userBO = userApp.getUserInfoByUsername(username);
+        if (userBO == null){
+            return JsonResult.fail("用户不存在");
+        }
+        UserInfoVO userInfoVO = userAdapter.toVO(userBO);
+        return JsonResult.ok(userInfoVO);
+    }
+
 
     public JsonResult updateUserBaseInfo(UserBO user, UserUpdateBaseInfoRequest userUpdateBaseInfoRequest) {
         if (user == null){

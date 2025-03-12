@@ -28,11 +28,22 @@ public class UserController {
         return JsonResult.ok(userService.login(userLoginRequest));
     }
 
+    /**
+     * 获取用户信息
+     * @return
+     */
     @GetMapping("/info")
     @RequiresAuthentication
     public JsonResult userInfo(){
         UserBO user = (UserBO)SecurityUtils.getSubject().getPrincipal();
         return userService.getUserInfo(user);
+    }
+
+    @GetMapping("/getUserInfo/{username}")
+    @RequiresAuthentication
+    public JsonResult getUserInfo(@PathVariable String username){
+        UserBO user = (UserBO)SecurityUtils.getSubject().getPrincipal();
+        return userService.getUserInfoByUsername(user,username);
     }
 
     @PutMapping("/updateInfo")
@@ -61,6 +72,7 @@ public class UserController {
         return userService.getJoinProject(user);
     }
 
+    // 获取用户信息
     @GetMapping("/getUser/{nickName}")
     public JsonResult getUserInfoByNickName(@PathVariable String nickName){
         return userService.getUserInfoByNickName(nickName);
