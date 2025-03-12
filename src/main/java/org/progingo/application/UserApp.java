@@ -79,4 +79,11 @@ public class UserApp {
     public List<UserBO> getUserInfoByNickName(String nickName) {
         return userRepository.findUserByNickName(nickName);
     }
+
+    public UserBO getUserInfoByUsername(String username){
+        if(username == null){
+            return null;
+        }
+        return userRepository.findUserByUsername(username);
+    }
 }

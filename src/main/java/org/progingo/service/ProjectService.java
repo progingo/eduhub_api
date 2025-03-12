@@ -1,6 +1,7 @@
 package org.progingo.service;
 
 import org.progingo.application.ProjectApp;
+import org.progingo.constant.UserConstant;
 import org.progingo.controller.request.project.*;
 
 import org.progingo.controller.vo.ProjectMemberInfoVO;
@@ -153,7 +154,7 @@ public class ProjectService {
         List<ProjectMemberInfoVO> projectMemberInfoVOList = projectMemberList.stream().map(x -> {
             return ProjectMemberInfoVO.builder()
                     .nickName(x.getNickname())
-                    .profilePhoto(x.getProfilePhoto())
+                    .profilePhoto(UserConstant.PROFILE_PHOTO_URL +x.getProfilePhoto())
                     .role(projectRepository.findProjectMemberRole(projectKey, x.getUsername()))
                     .username(x.getUsername())
                     .build();

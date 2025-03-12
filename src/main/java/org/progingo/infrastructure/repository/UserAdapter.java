@@ -1,5 +1,6 @@
 package org.progingo.infrastructure.repository;
 
+import org.progingo.constant.UserConstant;
 import org.progingo.controller.vo.UserInfoVO;
 import org.progingo.domain.user.User;
 import org.progingo.domain.user.UserBO;
@@ -24,7 +25,7 @@ public class UserAdapter {
         if (user == null)
             return null;
         UserInfoVO userVO = UserInfoVO.builder()
-                .profilePhoto("http://101.200.241.166:9000" + user.getProfilePhoto())
+                .profilePhoto(UserConstant.PROFILE_PHOTO_URL + user.getProfilePhoto())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .phone(user.getPhone())
