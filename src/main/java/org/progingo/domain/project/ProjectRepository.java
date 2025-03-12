@@ -11,6 +11,7 @@ public interface ProjectRepository {
     boolean save(Project project);
 
     List<ProjectBO> findProjectByPossessorUsername(String username);
+    List<ProjectBO> findPublicProjectsByPossessorUsername(String username);
 
     List<UserBO> findProjectMember(String projectKey);
 
