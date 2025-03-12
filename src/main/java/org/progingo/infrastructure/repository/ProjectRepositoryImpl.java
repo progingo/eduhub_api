@@ -44,14 +44,33 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         projectMemberExample.setOrderByClause("gmt_create desc");
 
         List<ProjectMember> projectMembers = projectMemberDao.selectByExample(projectMemberExample);
-        List<ProjectBO> projectBOList = projectMembers.stream().map(x ->{
-            ProjectExample projectExample = new ProjectExample();
-            projectExample.createCriteria().andKeyEqualTo(x.getProjectKey());
-            Project project = projectDao.selectByExample(projectExample).stream().findFirst().orElse(null);
-            return projectAdapter.toBO(project);
-        }).collect(Collectors.toList());
 
-        return projectBOList;
+        return projectMembers.stream().map(x -> {
+                    ProjectExample projectExample = new ProjectExample();
+                    projectExample.createCriteria().andKeyEqualTo(x.getProjectKey()).andIsDeleteEqualTo(false);
+                    return projectDao.selectByExample(projectExample).stream().findFirst().orElse(null);
+                }).filter(Objects::nonNull) // 过滤掉 null 值
+                .map(projectAdapter::toBO) // 转换为 ProjectBO
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProjectBO> findPublicProjectsByPossessorUsername(String username) {
+        ProjectMemberExample projectMemberExample = new ProjectMemberExample();
+        projectMemberExample.createCriteria()
+                .andUsernameEqualTo(username)
+                .andRoleEqualTo(ProjectMemberRole.MASTER.getCode());
+        projectMemberExample.setOrderByClause("gmt_create desc");
+
+        List<ProjectMember> projectMembers = projectMemberDao.selectByExample(projectMemberExample);
+
+        return projectMembers.stream().map(x -> {
+                    ProjectExample projectExample = new ProjectExample();
+                    projectExample.createCriteria().andKeyEqualTo(x.getProjectKey()).andIsDeleteEqualTo(false).andIsPrivateEqualTo(false);
+                    return projectDao.selectByExample(projectExample).stream().findFirst().orElse(null);
+                }).filter(Objects::nonNull) // 过滤掉 null 值
+                .map(projectAdapter::toBO) // 转换为 ProjectBO
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -60,7 +79,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         projectExample.createCriteria()
                 .andKeyEqualTo(projectKey);
         Project project = projectDao.selectByExample(projectExample).stream().findFirst().orElse(null);
-        if (project == null){
+        if (project == null) {
             return Collections.emptyList();
         }
 
@@ -95,6 +114,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     /**
      * 查询是否为项目组成员，包括管理员和创建者
+     *
      * @param projectKey
      * @param username
      * @return
@@ -142,28 +162,29 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Override
     public int deleteMember(String projectKey, Set<String> deleteMemberSet) {
         AtomicInteger num = new AtomicInteger();
-        deleteMemberSet.forEach(x ->{
-           if (userRepository.haveUser(x)){
-               //伪删除，其实为修改is_delete字段为true
-               ProjectMember projectMember = ProjectMember.builder()
-                       .projectKey(projectKey)
-                       .username(x)
-                       .isDelete(true)
-                       .gmtUpdate(new Date())
-                       .build();
-               ProjectMemberExample projectMemberExample = new ProjectMemberExample();
-               projectMemberExample.createCriteria()
-                       .andProjectKeyEqualTo(projectKey)
-                       .andUsernameEqualTo(x);
-               num.addAndGet(projectMemberDao.updateByExampleSelective(projectMember, projectMemberExample));
+        deleteMemberSet.forEach(x -> {
+            if (userRepository.haveUser(x)) {
+                //伪删除，其实为修改is_delete字段为true
+                ProjectMember projectMember = ProjectMember.builder()
+                        .projectKey(projectKey)
+                        .username(x)
+                        .isDelete(true)
+                        .gmtUpdate(new Date())
+                        .build();
+                ProjectMemberExample projectMemberExample = new ProjectMemberExample();
+                projectMemberExample.createCriteria()
+                        .andProjectKeyEqualTo(projectKey)
+                        .andUsernameEqualTo(x);
+                num.addAndGet(projectMemberDao.updateByExampleSelective(projectMember, projectMemberExample));
 //               num.addAndGet(projectMemberDao.deleteByExample(projectMemberExample));
-           }
+            }
         });
         return num.get();
     }
 
     /**
      * 删除项目，伪删除，修改is_delete字段为true
+     *
      * @param projectKey 项目key
      * @return
      */
@@ -178,6 +199,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     /**
      * 修改项目信息
+     *
      * @param projectBO 项目信息
      * @return
      */
@@ -188,7 +210,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         projectExample.createCriteria()
                 .andKeyEqualTo(projectBO.getKey())
                 .andIsDeleteEqualTo(false);
-        if (projectDao.updateByExampleSelective(projectAdapter.toDomain(projectBO), projectExample) > 0){
+        if (projectDao.updateByExampleSelective(projectAdapter.toDomain(projectBO), projectExample) > 0) {
             return 1;
         }
         return 0;
@@ -201,7 +223,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
                 .andKeyEqualTo(projectKey)
                 .andIsDeleteEqualTo(false);
         Project project = projectDao.selectByExample(projectExample).stream().findFirst().orElse(null);
-        if (project != null){
+        if (project != null) {
             return ProjectSetUpVO.builder()
                     .projectName(project.getProjectName())
                     .isPrivate(project.getIsPrivate())
@@ -216,20 +238,25 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         projectMemberExample.createCriteria()
                 .andUsernameEqualTo(username)
                 .andIsDeleteEqualTo(false);
+
+        // 获取项目key
         Set<String> projectSet = projectMemberDao.selectByExample(projectMemberExample).stream()
                 .map(ProjectMember::getProjectKey)
                 .collect(Collectors.toSet());
 
-        List<ProjectBO> projectBOList = projectSet.stream().map(x -> {
-            ProjectExample projectExample = new ProjectExample();
-            projectExample.createCriteria()
-                    .andKeyEqualTo(x)
-                    .andIsDeleteEqualTo(false);
-            Project project = projectDao.selectByExample(projectExample).stream().findFirst().orElse(null);
-            return projectAdapter.toBO(project);
-        }).collect(Collectors.toList());
-
-        return projectBOList;
+        return projectSet.stream()
+                .map(x -> {
+                    ProjectExample projectExample = new ProjectExample();
+                    projectExample.createCriteria()
+                            .andKeyEqualTo(x)
+                            .andIsDeleteEqualTo(false);
+                    return projectDao.selectByExample(projectExample).stream()
+                            .findFirst()
+                            .orElse(null);
+                })
+                .filter(Objects::nonNull) // 过滤掉 null 值
+                .map(projectAdapter::toBO) // 转换为 ProjectBO
+                .collect(Collectors.toList());
     }
 
 }

@@ -125,23 +125,14 @@ public class UserService {
      * @return
      */
     public JsonResult getCreateProject(UserBO user, String username) {
-        List<ProjectBO> projectBOList;
-        if (!"mine".equals(username)){
-            projectBOList = projectRepository.findProjectByPossessorUsername(username);
-        }else{
 
-            projectBOList = projectRepository.findProjectByPossessorUsername(user.getUsername());
-        }
-
-        if (!"mine".equals(username) &&  !username.equals(user.getUsername())){
-            //查看他人的项目，需要去除私有的资源
-            projectBOList.removeIf(ProjectBO::getIsPrivate);
-        }
-
+        List<ProjectBO> projectBOList = "mine".equals(username) || username.equals(user.getUsername())
+                ? projectRepository.findProjectByPossessorUsername(user.getUsername())
+                : projectRepository.findPublicProjectsByPossessorUsername(username);
+        // 转换为 ProjectVO 列表
         List<ProjectVO> projectVOList = projectBOList.stream()
-                .map(x -> projectAdapter.toVO(x))
+                .map(projectAdapter::toVO) // 转换为 VO
                 .collect(Collectors.toList());
-
         return JsonResult.ok(projectVOList);
     }
 

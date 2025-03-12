@@ -1,7 +1,9 @@
 package org.progingo.controller;
 
+import org.apache.catalina.users.GenericUser;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.progingo.controller.request.user.GetUserInfoRequest;
 import org.progingo.controller.request.user.UserLoginRequest;
 import org.progingo.controller.request.user.UserSignRequest;
 import org.progingo.controller.request.user.UserUpdateBaseInfoRequest;
@@ -65,6 +67,10 @@ public class UserController {
         return userService.getCreateProject(user,username);
     }
 
+    /**
+     * 获取username用户加入的项目
+     * @return
+     */
     @GetMapping("/getJoinProject")
     @RequiresAuthentication
     public JsonResult getJoinProject(){
@@ -73,9 +79,9 @@ public class UserController {
     }
 
     // 获取用户信息
-    @GetMapping("/getUser/{nickName}")
-    public JsonResult getUserInfoByNickName(@PathVariable String nickName){
-        return userService.getUserInfoByNickName(nickName);
+    @PostMapping("/getUser")
+    public JsonResult getUserInfoByNickName(@RequestBody GetUserInfoRequest getUserInfoRequest){
+        return userService.getUserInfoByNickName(getUserInfoRequest.getNickName());
 
     }
 }
