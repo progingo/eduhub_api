@@ -45,4 +45,12 @@ public class PPTController {
         UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
         return pptService.commitPPT(user,commitPPTRequest);
     }
+
+    @GetMapping("/tree/{resourceKey}")
+    @RequiresAuthentication
+    public JsonResult getPPTTree(@PathVariable String resourceKey){
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+        return pptService.getPPTTree(user,resourceKey);
+
+    }
 }

@@ -9,12 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class PPTGitTreeRepositoryImpl implements PPTGitTreeRepository {
 
     @Autowired
     private PptGitTreeDao pptGitTreeDao;
+    @Autowired
+    private PPTGitTreeAdapter pptGitTreeAdapter;
 
     @Override
     public boolean addTreeNode(PptGitTreeBO pptGitTreeBO) {
@@ -71,5 +75,30 @@ public class PPTGitTreeRepositoryImpl implements PPTGitTreeRepository {
         pptGitTree.setGmtCreate(pptGitTreeBO.getGmtCreate());
         pptGitTree.setGmtUpdate(pptGitTreeBO.getGmtUpdate());
         return pptGitTree;
+    }
+
+    @Override
+    public PptGitTreeBO findByKey(String nodeKey) {
+        PptGitTreeExample pptGitTreeExample = new PptGitTreeExample();
+        pptGitTreeExample.createCriteria()
+                .andKeyEqualTo(nodeKey)
+                .andIsDeleteEqualTo(false);
+        PptGitTree pptGitTree = pptGitTreeDao.selectByExample(pptGitTreeExample).stream().findFirst().orElse(null);
+        return pptGitTreeAdapter.toBO(pptGitTree);
+    }
+
+    @Override
+    public List<PptGitTreeBO> childrenNode(String nodeKey) {
+
+        PptGitTreeExample pptGitTreeExample = new PptGitTreeExample();
+        pptGitTreeExample.createCriteria()
+                .andParentKeyEqualTo(nodeKey)
+                .andIsDeleteEqualTo(false);
+        List<PptGitTreeBO> list = pptGitTreeDao.selectByExample(pptGitTreeExample).stream()
+                .map(x -> pptGitTreeAdapter.toBO(x))
+                .collect(Collectors.toList());
+
+        return list;
+
     }
 }

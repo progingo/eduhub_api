@@ -8,6 +8,7 @@ import org.progingo.controller.request.ppt.CommitPPTRequest;
 import org.progingo.controller.request.ppt.CreatePPTRequest;
 import org.progingo.controller.request.ppt.SavePPTRequest;
 import org.progingo.controller.vo.PPTInfoVO;
+import org.progingo.controller.vo.pptTree.nodes.Node;
 import org.progingo.dao.PptInfoDao;
 import org.progingo.domain.ppt.*;
 import org.progingo.domain.project.ProjectRepository;
@@ -20,6 +21,9 @@ import org.progingo.infrastructure.ppt.PPTInfoAdapter;
 import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class PPTService {
@@ -144,6 +148,21 @@ public class PPTService {
         }
 
         return JsonResult.ok();
+
+    }
+
+    public JsonResult getPPTTree(UserBO user, String resourceKey) {
+        if (user.isTourist()){
+            return JsonResult.fail(401, "请重新登陆");
+        }
+        boolean editor = resourceRepository.isEditor(resourceKey, user.getUsername());
+        if (!editor){
+            return JsonResult.fail("权限不足");
+        }
+
+        Object[] tree = pptGitTreeApp.getTree(resourceKey);
+
+        return JsonResult.ok(tree);
 
     }
 }
