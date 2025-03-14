@@ -50,26 +50,33 @@ public class PPTController {
 
     @GetMapping("/tree/{resourceKey}")
     @RequiresAuthentication
-    public JsonResult getPPTTree(@PathVariable String resourceKey){
+    public JsonResult getPPTTree(@PathVariable String resourceKey) {
         UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
-        return pptService.getPPTTree(user,resourceKey);
-    @GetMapping("/{id1}/{id2}")
-    public JsonResult getPPTS(@PathVariable("id1") Integer id1,@PathVariable("id2") Integer id2) {
-        System.out.println(id1);
-        System.out.println(id2);
-        String ppt1 = pptService.getPPT(id1);
+        return pptService.getPPTTree(user, resourceKey);
+    }
+
+
+    /**
+     *
+     * @param key1 第一个节点的ppt_tree的key
+     * @param key2 第二个节点的ppt_tree的key
+     * @return
+     */
+    @GetMapping("/merge/{key1}/{key2}")
+    @RequiresAuthentication
+    public JsonResult getMergePPT(@PathVariable("key1") String key1,@PathVariable("key2") String key2) {
+        System.out.println(key1);
+        System.out.println(key2);
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+
+        return pptService.getMergePPT(user, key1, key2);
+
+/*        String ppt1 = pptService.getPPT(id1);
         String ppt2 = pptService.getPPT(id2);
         ArrayList<String> datas = new ArrayList<>();
         datas.add(ppt1);
-        datas.add(ppt2);
-        return JsonResult.ok(datas);
-    }
-
-    @GetMapping("{id}")
-    public JsonResult getPPT(@PathVariable("id") Integer id){
-        System.out.println(id);
-        return JsonResult.ok(pptService.getPPT(id));
-
+        datas.add(ppt2);*/
+        //return JsonResult.ok(datas);
     }
 
     @GetMapping("/init")

@@ -3,27 +3,22 @@ package org.progingo.service;
 import com.alibaba.fastjson2.JSON;
 import org.progingo.application.PPTGitTreeApp;
 import org.progingo.application.PPTInfoApp;
-import org.progingo.application.ResourceApp;
 import org.progingo.controller.request.ppt.CommitPPTRequest;
 import org.progingo.controller.request.ppt.CreatePPTRequest;
 import org.progingo.controller.request.ppt.SavePPTRequest;
 import org.progingo.controller.vo.PPTInfoVO;
-import org.progingo.controller.vo.pptTree.nodes.Node;
 import org.progingo.dao.PptInfoDao;
 import org.progingo.domain.ppt.*;
-import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.resource.ResourceRepository;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.ResultCode;
 import org.progingo.domain.user.UserBO;
-import org.progingo.domain.user.UserRepository;
 import org.progingo.infrastructure.ppt.PPTInfoAdapter;
 import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.ArrayList;
 
 @Service
 public class PPTService {
@@ -163,6 +158,44 @@ public class PPTService {
         Object[] tree = pptGitTreeApp.getTree(resourceKey);
 
         return JsonResult.ok(tree);
+
+    }
+
+    public JsonResult getMergePPT(UserBO user, String key1, String key2) {
+        if (user.isTourist()){
+            return JsonResult.fail(401, "请重新登陆");
+        }
+
+        PptGitTreeBO node1 = pptGitTreeRepository.findByKey(key1);
+        PptGitTreeBO node2 = pptGitTreeRepository.findByKey(key2);
+
+        if (node1 == null || node2 == null){
+            return JsonResult.fail("节点不存在");
+        }
+
+        //检查是否是同一个资源的节点
+        if (!node1.getResourceKey().equals(node2.getResourceKey())){
+            return JsonResult.fail("节点不在同一个资源中");
+        }
+
+        if (!resourceRepository.isEditor(user.getUsername(), node1.getResourceKey())){
+            return JsonResult.fail("权限不足");
+        }
+
+        //检查是否存在父子关系
+        boolean haveConsanguinity = pptGitTreeApp.checkConsanguinity(node1.getKey(), node2.getKey());
+        if(haveConsanguinity){
+            return JsonResult.fail("两个节点不能是自己或子孙关系");
+        }
+
+        //获取两个节点内容
+        PPTInfoBO pptInfo1 = pptRepository.findPPTInfoByKey(node1.getPptKey());
+        PPTInfoBO pptInfo2 = pptRepository.findPPTInfoByKey(node2.getPptKey());
+        ArrayList<String> datas = new ArrayList<>();
+        datas.add(pptInfo1.getPptEntity().getSlides());
+        datas.add(pptInfo2.getPptEntity().getSlides());
+
+        return JsonResult.ok(datas);
 
     }
 }

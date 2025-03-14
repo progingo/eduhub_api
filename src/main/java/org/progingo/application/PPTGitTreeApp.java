@@ -1,6 +1,5 @@
 package org.progingo.application;
 
-import com.alibaba.fastjson2.JSON;
 import org.progingo.controller.vo.pptTree.edges.Edges;
 import org.progingo.controller.vo.pptTree.nodes.Node;
 import org.progingo.controller.vo.pptTree.nodes.NodeData;
@@ -12,12 +11,12 @@ import org.progingo.domain.PptGitTreeExample;
 import org.progingo.domain.ppt.*;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.ResultCode;
-import org.progingo.infrastructure.ppt.PPTGitTreeRepositoryImpl;
 import org.progingo.util.MyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -168,5 +167,34 @@ public class PPTGitTreeApp {
     }
 
 
+    /**
+     * 检查两个节点是否有血缘关系(节点是另一个节点的直系子孙)
+     * @param key1
+     * @param key2
+     */
+    public boolean checkConsanguinity(String key1, String key2) {
+        PptGitTreeBO pptGitTreeBO;
+        String key = key1;
+        //key1是key2的直系子孙
+        do {
+            if (key.equals(key2)){
+                return true;
+            }
+            pptGitTreeBO = pptGitTreeRepository.findByKey(key);
+            key = pptGitTreeBO.getParentKey();
 
+        }while (!pptGitTreeBO.getIsRoot());
+
+        key = key2;
+        do {
+            if (key.equals(key1)){
+                return true;
+            }
+            pptGitTreeBO = pptGitTreeRepository.findByKey(key);
+            key = pptGitTreeBO.getParentKey();
+        }while (!pptGitTreeBO.getIsRoot());
+
+        return false;
+
+    }
 }
