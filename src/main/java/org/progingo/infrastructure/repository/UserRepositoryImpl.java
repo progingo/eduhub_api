@@ -8,7 +8,10 @@ import org.progingo.domain.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -45,5 +48,19 @@ public class UserRepositoryImpl implements UserRepository {
         UserExample userExample = new UserExample();
         userExample.createCriteria().andUsernameEqualTo(username);
         return userDao.countByExample(userExample) > 0;
+    }
+
+    @Override
+    public List<UserBO> findUserByNickName(String nickName) {
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andNicknameEqualTo(nickName);
+
+        List<UserBO> userList = userDao.selectByExample(userExample)
+                .stream()
+                .map(x -> userAdapter.toBO(x))
+                .collect(Collectors.toList());
+
+
+        return userList;
     }
 }

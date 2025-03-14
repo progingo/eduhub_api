@@ -2,16 +2,18 @@ package org.progingo.application;
 
 
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.progingo.controller.vo.UserInfoVO;
 import org.progingo.dao.UserDao;
 import org.progingo.domain.user.*;
 import org.progingo.infrastructure.repository.UserAdapter;
-import org.progingo.util.JsonResult;
 import org.progingo.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class UserApp {
@@ -34,6 +36,7 @@ public class UserApp {
             return ActionResult.fail(ResultCode.PHONE_EXIST);
         }
         signUser.setUsername(UUID.randomUUID().toString());
+        signUser.setProfilePhoto("/eduhub/profile_photo.png");
         signUser.setSalt(UUID.randomUUID().toString().replaceAll("-", ""));
         signUser.setPassword(new Md5Hash(signUser.getPassword(), signUser.getSalt(), 3).toString());
         signUser.setGmtCreate(new Date());
@@ -71,5 +74,16 @@ public class UserApp {
         userRepository.updateUser(user);
         tokenUtil.deleteIdToken(user.getId());
         return ActionResult.ok();
+    }
+
+    public List<UserBO> getUserInfoByNickName(String nickName) {
+        return userRepository.findUserByNickName(nickName);
+    }
+
+    public UserBO getUserInfoByUsername(String username){
+        if(username == null){
+            return null;
+        }
+        return userRepository.findUserByUsername(username);
     }
 }

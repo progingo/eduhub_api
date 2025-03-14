@@ -79,6 +79,18 @@ public class UserService {
         return JsonResult.ok(userVO);
     }
 
+    public JsonResult getUserInfoByUsername(UserBO user,String username) {
+        if (user == null){
+            return JsonResult.fail(401,"请重新登陆");
+        }
+        UserBO userBO = userApp.getUserInfoByUsername(username);
+        if (userBO == null){
+            return JsonResult.fail("用户不存在");
+        }
+        UserInfoVO userInfoVO = userAdapter.toVO(userBO);
+        return JsonResult.ok(userInfoVO);
+    }
+
 
     public JsonResult updateUserBaseInfo(UserBO user, UserUpdateBaseInfoRequest userUpdateBaseInfoRequest) {
         if (user == null){
@@ -113,23 +125,14 @@ public class UserService {
      * @return
      */
     public JsonResult getCreateProject(UserBO user, String username) {
-        List<ProjectBO> projectBOList;
-        if (!"mine".equals(username)){
-            projectBOList = projectRepository.findProjectByPossessorUsername(username);
-        }else{
 
-            projectBOList = projectRepository.findProjectByPossessorUsername(user.getUsername());
-        }
-
-        if (!"mine".equals(username) &&  !username.equals(user.getUsername())){
-            //查看他人的项目，需要去除私有的资源
-            projectBOList.removeIf(ProjectBO::getIsPrivate);
-        }
-
+        List<ProjectBO> projectBOList = "mine".equals(username) || username.equals(user.getUsername())
+                ? projectRepository.findProjectByPossessorUsername(user.getUsername())
+                : projectRepository.findPublicProjectsByPossessorUsername(username);
+        // 转换为 ProjectVO 列表
         List<ProjectVO> projectVOList = projectBOList.stream()
-                .map(x -> projectAdapter.toVO(x))
+                .map(projectAdapter::toVO) // 转换为 VO
                 .collect(Collectors.toList());
-
         return JsonResult.ok(projectVOList);
     }
 
@@ -142,5 +145,15 @@ public class UserService {
                 .map(x -> projectAdapter.toVO(x))
                 .collect(Collectors.toList());
         return JsonResult.ok(projectVOList);
+    }
+
+    public JsonResult getUserInfoByNickName(String nickName) {
+        List<UserBO> userList = userApp.getUserInfoByNickName(nickName);
+        List<UserInfoVO> userVOList = userList
+                .stream()
+                .map(x -> userAdapter.toVO(x))
+                .collect(Collectors.toList());
+        return JsonResult.ok(userVOList);
+
     }
 }

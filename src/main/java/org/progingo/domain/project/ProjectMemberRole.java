@@ -12,6 +12,7 @@ public enum ProjectMemberRole {
     ONLY_READ_MEMBER(0),
     MEMBER(1),
     ADMIN(2),
+    MASTER(3),  // 创建者
 
     ;
     private final Integer code;

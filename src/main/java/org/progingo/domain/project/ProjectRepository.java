@@ -1,5 +1,7 @@
 package org.progingo.domain.project;
 
+import org.progingo.controller.vo.ProjectMemberInfoVO;
+import org.progingo.controller.vo.ProjectSetUpVO;
 import org.progingo.domain.user.UserBO;
 
 import java.util.List;
@@ -9,12 +11,25 @@ public interface ProjectRepository {
     boolean save(Project project);
 
     List<ProjectBO> findProjectByPossessorUsername(String username);
+    List<ProjectBO> findPublicProjectsByPossessorUsername(String username);
 
     List<UserBO> findProjectMember(String projectKey);
 
     boolean isAdmin(String projectKey, String username);
 
-    int addMember(String projectKey, Set<String> addMemberSet);
+    boolean isMember(String projectKey, String username);
+
+    boolean isEditor(String projectKey, String username);
+
+    int findProjectMemberRole(String projectKey, String username);
 
     List<ProjectBO> findProjectByMemberUsername(String username);
+
+    int deleteMember(String projectKey, Set<String> deleteMemberSet);
+
+    int deleteProject(String projectKey);
+
+    int reviseProject(ProjectBO projectBO);
+
+    ProjectSetUpVO findProjectByProjectKey(String projectKey);
 }

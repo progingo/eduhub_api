@@ -15,7 +15,6 @@ public class ProjectAdapter {
                 .id(project.getId())
                 .key(project.getKey())
                 .projectName(project.getProjectName())
-                .possessorUsername(project.getPossessorUsername())
                 .isPrivate(project.getIsPrivate())
                 .isDelete(project.getIsDelete())
                 .gmtCreate(project.getGmtCreate())
@@ -30,5 +29,16 @@ public class ProjectAdapter {
                 .possessorUsername(projectBO.getPossessorUsername())
                 .isPrivate(projectBO.getIsPrivate())
                 .build();
+    }
+    public Project toDomain(ProjectBO projectBO){
+        Project build = Project.builder()
+                .id(projectBO.getId())
+                .key(projectBO.getKey())
+                .projectName(projectBO.getProjectName())
+                .isPrivate(projectBO.getIsPrivate())
+                .isDelete(projectBO.getIsDelete())
+                .gmtCreate(projectBO.getGmtCreate())
+                .build();
+        return build;
     }
 }

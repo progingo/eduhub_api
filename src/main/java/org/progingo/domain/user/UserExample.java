@@ -235,6 +235,76 @@ public class UserExample {
             return (Criteria) this;
         }
 
+        public Criteria andProfilePhotoIsNull() {
+            addCriterion("profile_photo is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoIsNotNull() {
+            addCriterion("profile_photo is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoEqualTo(String value) {
+            addCriterion("profile_photo =", value, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoNotEqualTo(String value) {
+            addCriterion("profile_photo <>", value, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoGreaterThan(String value) {
+            addCriterion("profile_photo >", value, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoGreaterThanOrEqualTo(String value) {
+            addCriterion("profile_photo >=", value, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoLessThan(String value) {
+            addCriterion("profile_photo <", value, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoLessThanOrEqualTo(String value) {
+            addCriterion("profile_photo <=", value, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoLike(String value) {
+            addCriterion("profile_photo like", value, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoNotLike(String value) {
+            addCriterion("profile_photo not like", value, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoIn(List<String> values) {
+            addCriterion("profile_photo in", values, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoNotIn(List<String> values) {
+            addCriterion("profile_photo not in", values, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoBetween(String value1, String value2) {
+            addCriterion("profile_photo between", value1, value2, "profilePhoto");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfilePhotoNotBetween(String value1, String value2) {
+            addCriterion("profile_photo not between", value1, value2, "profilePhoto");
+            return (Criteria) this;
+        }
+
         public Criteria andNicknameIsNull() {
             addCriterion("nickname is null");
             return (Criteria) this;

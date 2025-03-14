@@ -1,8 +1,8 @@
 package org.progingo.dao;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.progingo.domain.PptInfo;
-import org.progingo.domain.PptInfoExample;
+import org.progingo.domain.ppt.PptInfo;
+import org.progingo.domain.ppt.PptInfoExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 

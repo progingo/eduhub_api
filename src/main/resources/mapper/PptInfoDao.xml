@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.progingo.dao.PptInfoDao">
-  <resultMap id="BaseResultMap" type="org.progingo.domain.PptInfo">
+  <resultMap id="BaseResultMap" type="org.progingo.domain.ppt.PptInfo">
     <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="key" jdbcType="VARCHAR" property="key" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="node_key" jdbcType="VARCHAR" property="nodeKey" />
+    <result column="state" jdbcType="INTEGER" property="state" />
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="slides" jdbcType="VARCHAR" property="slides" />
     <result column="viewportSize" jdbcType="VARCHAR" property="viewportsize" />
     <result column="viewportRatio" jdbcType="VARCHAR" property="viewportratio" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="gmt_update" jdbcType="TIMESTAMP" property="gmtUpdate" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -67,9 +73,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, title, slides, viewportSize, viewportRatio
+    id, `key`, username, node_key, `state`, title, slides, viewportSize, viewportRatio, 
+    gmt_create, gmt_update
   </sql>
-  <select id="selectByExample" parameterType="org.progingo.domain.PptInfoExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="org.progingo.domain.ppt.PptInfoExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -93,21 +100,37 @@
     delete from ppt_info
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="org.progingo.domain.PptInfoExample">
+  <delete id="deleteByExample" parameterType="org.progingo.domain.ppt.PptInfoExample">
     delete from ppt_info
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.PptInfo" useGeneratedKeys="true">
-    insert into ppt_info (title, slides, viewportSize, 
-      viewportRatio)
-    values (#{title,jdbcType=VARCHAR}, #{slides,jdbcType=VARCHAR}, #{viewportsize,jdbcType=VARCHAR}, 
-      #{viewportratio,jdbcType=VARCHAR})
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.ppt.PptInfo" useGeneratedKeys="true">
+    insert into ppt_info (`key`, username, node_key, 
+      `state`, title, slides, 
+      viewportSize, viewportRatio, gmt_create, 
+      gmt_update)
+    values (#{key,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{nodeKey,jdbcType=VARCHAR}, 
+      #{state,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{slides,jdbcType=VARCHAR}, 
+      #{viewportsize,jdbcType=VARCHAR}, #{viewportratio,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, 
+      #{gmtUpdate,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.PptInfo" useGeneratedKeys="true">
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.ppt.PptInfo" useGeneratedKeys="true">
     insert into ppt_info
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="key != null">
+        `key`,
+      </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="nodeKey != null">
+        node_key,
+      </if>
+      <if test="state != null">
+        `state`,
+      </if>
       <if test="title != null">
         title,
       </if>
@@ -120,8 +143,26 @@
       <if test="viewportratio != null">
         viewportRatio,
       </if>
+      <if test="gmtCreate != null">
+        gmt_create,
+      </if>
+      <if test="gmtUpdate != null">
+        gmt_update,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="key != null">
+        #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeKey != null">
+        #{nodeKey,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
       <if test="title != null">
         #{title,jdbcType=VARCHAR},
       </if>
@@ -134,9 +175,15 @@
       <if test="viewportratio != null">
         #{viewportratio,jdbcType=VARCHAR},
       </if>
+      <if test="gmtCreate != null">
+        #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gmtUpdate != null">
+        #{gmtUpdate,jdbcType=TIMESTAMP},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="org.progingo.domain.PptInfoExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="org.progingo.domain.ppt.PptInfoExample" resultType="java.lang.Long">
     select count(*) from ppt_info
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -147,6 +194,18 @@
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.key != null">
+        `key` = #{record.key,jdbcType=VARCHAR},
+      </if>
+      <if test="record.username != null">
+        username = #{record.username,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nodeKey != null">
+        node_key = #{record.nodeKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.state != null">
+        `state` = #{record.state,jdbcType=INTEGER},
       </if>
       <if test="record.title != null">
         title = #{record.title,jdbcType=VARCHAR},
@@ -160,6 +219,12 @@
       <if test="record.viewportratio != null">
         viewportRatio = #{record.viewportratio,jdbcType=VARCHAR},
       </if>
+      <if test="record.gmtCreate != null">
+        gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.gmtUpdate != null">
+        gmt_update = #{record.gmtUpdate,jdbcType=TIMESTAMP},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -168,17 +233,35 @@
   <update id="updateByExample" parameterType="map">
     update ppt_info
     set id = #{record.id,jdbcType=INTEGER},
+      `key` = #{record.key,jdbcType=VARCHAR},
+      username = #{record.username,jdbcType=VARCHAR},
+      node_key = #{record.nodeKey,jdbcType=VARCHAR},
+      `state` = #{record.state,jdbcType=INTEGER},
       title = #{record.title,jdbcType=VARCHAR},
       slides = #{record.slides,jdbcType=VARCHAR},
       viewportSize = #{record.viewportsize,jdbcType=VARCHAR},
-      viewportRatio = #{record.viewportratio,jdbcType=VARCHAR}
+      viewportRatio = #{record.viewportratio,jdbcType=VARCHAR},
+      gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      gmt_update = #{record.gmtUpdate,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="org.progingo.domain.PptInfo">
+  <update id="updateByPrimaryKeySelective" parameterType="org.progingo.domain.ppt.PptInfo">
     update ppt_info
     <set>
+      <if test="key != null">
+        `key` = #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeKey != null">
+        node_key = #{nodeKey,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        `state` = #{state,jdbcType=INTEGER},
+      </if>
       <if test="title != null">
         title = #{title,jdbcType=VARCHAR},
       </if>
@@ -191,15 +274,27 @@
       <if test="viewportratio != null">
         viewportRatio = #{viewportratio,jdbcType=VARCHAR},
       </if>
+      <if test="gmtCreate != null">
+        gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gmtUpdate != null">
+        gmt_update = #{gmtUpdate,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="org.progingo.domain.PptInfo">
+  <update id="updateByPrimaryKey" parameterType="org.progingo.domain.ppt.PptInfo">
     update ppt_info
-    set title = #{title,jdbcType=VARCHAR},
+    set `key` = #{key,jdbcType=VARCHAR},
+      username = #{username,jdbcType=VARCHAR},
+      node_key = #{nodeKey,jdbcType=VARCHAR},
+      `state` = #{state,jdbcType=INTEGER},
+      title = #{title,jdbcType=VARCHAR},
       slides = #{slides,jdbcType=VARCHAR},
       viewportSize = #{viewportsize,jdbcType=VARCHAR},
-      viewportRatio = #{viewportratio,jdbcType=VARCHAR}
+      viewportRatio = #{viewportratio,jdbcType=VARCHAR},
+      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      gmt_update = #{gmtUpdate,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

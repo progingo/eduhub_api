@@ -5,7 +5,6 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="key" jdbcType="VARCHAR" property="key" />
     <result column="project_name" jdbcType="VARCHAR" property="projectName" />
-    <result column="possessor_username" jdbcType="VARCHAR" property="possessorUsername" />
     <result column="is_private" jdbcType="BOOLEAN" property="isPrivate" />
     <result column="is_delete" jdbcType="BOOLEAN" property="isDelete" />
     <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
@@ -69,7 +68,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, `key`, project_name, possessor_username, is_private, is_delete, gmt_create
+    id, `key`, project_name, is_private, is_delete, gmt_create
   </sql>
   <select id="selectByExample" parameterType="org.progingo.domain.project.ProjectExample" resultMap="BaseResultMap">
     select
@@ -102,12 +101,10 @@
     </if>
   </delete>
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.project.Project" useGeneratedKeys="true">
-    insert into project (`key`, project_name, possessor_username, 
-      is_private, is_delete, gmt_create
-      )
-    values (#{key,jdbcType=VARCHAR}, #{projectName,jdbcType=VARCHAR}, #{possessorUsername,jdbcType=VARCHAR}, 
-      #{isPrivate,jdbcType=BOOLEAN}, #{isDelete,jdbcType=BOOLEAN}, #{gmtCreate,jdbcType=TIMESTAMP}
-      )
+    insert into project (`key`, project_name, is_private, 
+      is_delete, gmt_create)
+    values (#{key,jdbcType=VARCHAR}, #{projectName,jdbcType=VARCHAR}, #{isPrivate,jdbcType=BOOLEAN}, 
+      #{isDelete,jdbcType=BOOLEAN}, #{gmtCreate,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.project.Project" useGeneratedKeys="true">
     insert into project
@@ -117,9 +114,6 @@
       </if>
       <if test="projectName != null">
         project_name,
-      </if>
-      <if test="possessorUsername != null">
-        possessor_username,
       </if>
       <if test="isPrivate != null">
         is_private,
@@ -137,9 +131,6 @@
       </if>
       <if test="projectName != null">
         #{projectName,jdbcType=VARCHAR},
-      </if>
-      <if test="possessorUsername != null">
-        #{possessorUsername,jdbcType=VARCHAR},
       </if>
       <if test="isPrivate != null">
         #{isPrivate,jdbcType=BOOLEAN},
@@ -170,9 +161,6 @@
       <if test="record.projectName != null">
         project_name = #{record.projectName,jdbcType=VARCHAR},
       </if>
-      <if test="record.possessorUsername != null">
-        possessor_username = #{record.possessorUsername,jdbcType=VARCHAR},
-      </if>
       <if test="record.isPrivate != null">
         is_private = #{record.isPrivate,jdbcType=BOOLEAN},
       </if>
@@ -192,7 +180,6 @@
     set id = #{record.id,jdbcType=INTEGER},
       `key` = #{record.key,jdbcType=VARCHAR},
       project_name = #{record.projectName,jdbcType=VARCHAR},
-      possessor_username = #{record.possessorUsername,jdbcType=VARCHAR},
       is_private = #{record.isPrivate,jdbcType=BOOLEAN},
       is_delete = #{record.isDelete,jdbcType=BOOLEAN},
       gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP}
@@ -208,9 +195,6 @@
       </if>
       <if test="projectName != null">
         project_name = #{projectName,jdbcType=VARCHAR},
-      </if>
-      <if test="possessorUsername != null">
-        possessor_username = #{possessorUsername,jdbcType=VARCHAR},
       </if>
       <if test="isPrivate != null">
         is_private = #{isPrivate,jdbcType=BOOLEAN},
@@ -228,7 +212,6 @@
     update project
     set `key` = #{key,jdbcType=VARCHAR},
       project_name = #{projectName,jdbcType=VARCHAR},
-      possessor_username = #{possessorUsername,jdbcType=VARCHAR},
       is_private = #{isPrivate,jdbcType=BOOLEAN},
       is_delete = #{isDelete,jdbcType=BOOLEAN},
       gmt_create = #{gmtCreate,jdbcType=TIMESTAMP}

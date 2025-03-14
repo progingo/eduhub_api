@@ -1,10 +1,14 @@
 package org.progingo.service;
 
-import cn.hutool.core.util.BooleanUtil;
 import org.progingo.application.ProjectApp;
-import org.progingo.controller.request.project.AddMemberRequest;
-import org.progingo.controller.request.project.CreateProjectRequest;
+import org.progingo.constant.UserConstant;
+import org.progingo.controller.request.project.*;
+
+import org.progingo.controller.vo.ProjectMemberInfoVO;
+import org.progingo.controller.vo.ProjectSetUpVO;
 import org.progingo.domain.project.Project;
+import org.progingo.domain.project.ProjectBO;
+import org.progingo.domain.project.ProjectMemberRole;
 import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.UserBO;
@@ -16,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class ProjectService {
@@ -29,11 +32,11 @@ public class ProjectService {
     private ProjectRepository projectRepository;
 
     public JsonResult createProject(UserBO user, CreateProjectRequest createProjectRequest) {
-        String username = user.getUsername();
-        if (username.isEmpty()){
+
+        if (user.isTourist()){
             return JsonResult.ok(401,"请重新登陆");
         }
-        System.out.println(createProjectRequest.getIsPrivate().equals(1));
+
         Project project = Project.builder()
                 .projectName(createProjectRequest.getProjectName())
                 .isPrivate(createProjectRequest.getIsPrivate().equals(1))
@@ -44,9 +47,7 @@ public class ProjectService {
             return JsonResult.fail(checkActionResult.getMsg());
         }
 
-        project.setPossessorUsername(username);
-
-        ActionResult result = projectApp.createProject(project);
+        ActionResult result = projectApp.createProject(user, project);
         if (!result.isSuccess()){
             return JsonResult.fail(result.getMsg());
         }
@@ -54,6 +55,60 @@ public class ProjectService {
         return JsonResult.ok(result.getMsg());
     }
 
+    /**
+     * 删除项目
+     * @param user
+     * @param projectKey
+     * @return
+     */
+    public JsonResult deleteProject(UserBO user, String projectKey) {
+        if (user.isTourist()){
+            return JsonResult.ok(401,"请重新登陆");
+        }
+        ActionResult actionResult = projectApp.deleteProject(user, projectKey);
+        if (!actionResult.isSuccess()){
+            return JsonResult.fail(actionResult.getMsg());
+        }
+        return JsonResult.ok(actionResult.getMsg());
+    }
+
+    /**
+     * 修改项目
+     * @param user
+     * @param reviseProjectRequest
+     * @return
+     */
+    public JsonResult reviseProject(UserBO user, ReviseProjectRequest reviseProjectRequest) {
+        String projectKey = reviseProjectRequest.getProjectKey();
+        if (user.isTourist()){
+            return JsonResult.ok(401,"请重新登陆");
+        }
+        if (!projectRepository.isAdmin(projectKey, user.getUsername())){
+            return JsonResult.fail("您不是该项目管理员，无法修改项目");
+        }
+        // 把reviseRoleRequest转为ProjectBO
+        ProjectBO projectBO = ProjectBO.builder()
+                .key(reviseProjectRequest.getProjectKey())
+                .projectName(reviseProjectRequest.getProjectName())
+                .isPrivate(reviseProjectRequest.getIsPrivate().equals(1))
+                .build();
+        ActionResult actionResult = projectApp.reviseProject(user, projectBO);
+        if (!actionResult.isSuccess()){
+            return JsonResult.fail(actionResult.getMsg());
+        }
+        return JsonResult.ok(actionResult.getMsg());
+    }
+
+    public JsonResult getProjectSetUp(UserBO user, String projectKey){
+        if (user.isTourist()){
+            return JsonResult.ok(401,"请重新登陆");
+        }
+        if (!projectRepository.isMember(projectKey, user.getUsername())){
+            return JsonResult.fail("您不是该项目成员，无法查看项目设置");
+        }
+        ProjectSetUpVO projectSetUp =  projectRepository.findProjectByProjectKey(projectKey);
+        return JsonResult.ok(projectSetUp);
+    }
     public JsonResult addMember(UserBO user, AddMemberRequest addMemberRequest) {
         List<UserBO> projectMemberList = projectRepository.findProjectMember(addMemberRequest.getProjectKey());
         Set<String> projectMemberIdSet = projectMemberList.stream().map(UserBO::getUsername).collect(Collectors.toSet());
@@ -68,5 +123,73 @@ public class ProjectService {
             return JsonResult.fail(actionResult.getMsg());
         }
         return JsonResult.ok(actionResult.getMsg());
+    }
+    public JsonResult deleteProjectMember(UserBO user, DeleteMemberRequest deleteMemberRequest){
+        List<UserBO> projectMemberList = projectRepository.findProjectMember(deleteMemberRequest.getProjectKey());
+        Set<String> projectMemberIdSet = projectMemberList.stream().map(UserBO::getUsername).collect(Collectors.toSet());
+        //只有当成员为项目成员时才删除，并且不能删除自己
+        Set<String> deleteMemberSet = deleteMemberRequest.getUsernameList()
+                .stream()
+                .filter(x -> projectMemberIdSet.contains(x) && !x.equals(user.getUsername()))
+                .collect(Collectors.toSet());
+
+        if(deleteMemberSet.isEmpty()){
+            return JsonResult.fail("请选择要删除的成员");
+        }
+
+        ActionResult actionResult = projectApp.deleteProjectMember(user, deleteMemberRequest.getProjectKey(), deleteMemberSet);
+        if (!actionResult.isSuccess()) {
+            return JsonResult.fail(actionResult.getMsg());
+        }
+        return JsonResult.ok(actionResult.getMsg());
+
+
+    }
+
+    public JsonResult getProjectMember(String projectKey) {
+        if(projectKey == null){
+            return JsonResult.fail("项目不存在");
+        }
+        List<UserBO> projectMemberList = projectRepository.findProjectMember(projectKey);
+        List<ProjectMemberInfoVO> projectMemberInfoVOList = projectMemberList.stream().map(x -> {
+            return ProjectMemberInfoVO.builder()
+                    .nickName(x.getNickname())
+                    .profilePhoto(UserConstant.PROFILE_PHOTO_URL +x.getProfilePhoto())
+                    .role(projectRepository.findProjectMemberRole(projectKey, x.getUsername()))
+                    .username(x.getUsername())
+                    .build();
+        }).collect(Collectors.toList());
+        if (projectMemberInfoVOList.isEmpty()){
+            return JsonResult.fail("项目成员为空");
+        }
+        return JsonResult.ok(projectMemberInfoVOList);
+    }
+
+    /**
+     * 修改项目成员角色
+     * @param user  当前用户
+     * @param reviseRoleRequest 修改角色请求
+     * @return
+     */
+    public JsonResult reviseRole(UserBO user, ReviseRoleRequest reviseRoleRequest) {
+        String username = user.getUsername();
+        String projectKey = reviseRoleRequest.getProjectKey();
+        if (user.isTourist()){
+            return JsonResult.ok(401,"请重新登陆");
+        }
+        if (!projectRepository.isAdmin(projectKey, username)){
+            return JsonResult.fail("权限不足");
+        }
+        if (!projectRepository.isMember(projectKey, reviseRoleRequest.getUsername())){
+            return JsonResult.fail("成员不存在");
+        }
+        ActionResult actionResult = projectApp.reviseRole(username,projectKey,
+                reviseRoleRequest.getUsername(), ProjectMemberRole.getByCode(reviseRoleRequest.getRole()));
+
+        if (!actionResult.isSuccess()){
+            return JsonResult.fail(actionResult.getMsg());
+        }
+        return JsonResult.ok(actionResult.getMsg());
+
     }
 }

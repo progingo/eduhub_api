@@ -1,7 +1,9 @@
 package org.progingo.controller;
 
+import org.apache.catalina.users.GenericUser;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.progingo.controller.request.user.GetUserInfoRequest;
 import org.progingo.controller.request.user.UserLoginRequest;
 import org.progingo.controller.request.user.UserSignRequest;
 import org.progingo.controller.request.user.UserUpdateBaseInfoRequest;
@@ -28,11 +30,22 @@ public class UserController {
         return JsonResult.ok(userService.login(userLoginRequest));
     }
 
+    /**
+     * 获取用户信息
+     * @return
+     */
     @GetMapping("/info")
     @RequiresAuthentication
     public JsonResult userInfo(){
         UserBO user = (UserBO)SecurityUtils.getSubject().getPrincipal();
         return userService.getUserInfo(user);
+    }
+
+    @GetMapping("/getUserInfo/{username}")
+    @RequiresAuthentication
+    public JsonResult getUserInfo(@PathVariable String username){
+        UserBO user = (UserBO)SecurityUtils.getSubject().getPrincipal();
+        return userService.getUserInfoByUsername(user,username);
     }
 
     @PutMapping("/updateInfo")
@@ -54,10 +67,21 @@ public class UserController {
         return userService.getCreateProject(user,username);
     }
 
+    /**
+     * 获取username用户加入的项目
+     * @return
+     */
     @GetMapping("/getJoinProject")
     @RequiresAuthentication
     public JsonResult getJoinProject(){
         UserBO user = (UserBO)SecurityUtils.getSubject().getPrincipal();
         return userService.getJoinProject(user);
+    }
+
+    // 获取用户信息
+    @PostMapping("/getUser")
+    public JsonResult getUserInfoByNickName(@RequestBody GetUserInfoRequest getUserInfoRequest){
+        return userService.getUserInfoByNickName(getUserInfoRequest.getNickName());
+
     }
 }

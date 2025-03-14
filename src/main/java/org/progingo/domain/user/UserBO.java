@@ -14,6 +14,7 @@ public class UserBO {
 
     private String nickname;
 
+    private String profilePhoto;
 
     private String phone;
 
