@@ -92,6 +92,33 @@ public class PPTGitTreeApp {
         return ActionResult.ok(key);
     }
 
+
+    public ActionResult createNode(String username,String nodeKey1,String nodeKey2, String pptKey, String remark) {
+        PptGitTreeBO pptGitTreeBOByNodeKey = pptGitTreeRepository.findByKey(nodeKey1);
+
+
+        String key = myUtil.nextId("ppt_git_tree_key");//我们的工具类中的这个方法正好能满足这个key所需要的条件，所以我们直接调用
+        PptGitTreeBO pptGitTreeBO = PptGitTreeBO.builder()
+                .remark("资源初始化创建")
+                .key(key)
+                .username(username)
+                .resourceKey(pptGitTreeBOByNodeKey.getResourceKey())
+                .pptKey(pptKey)
+                .remark(remark)
+                .isRoot(false)
+                .operation(PPTTreeOperation.MERGE)
+                .parentKey(nodeKey1)
+                .mergeParentKey(nodeKey2)
+                .isDelete(false)
+                .build();
+        boolean b = pptGitTreeRepository.addTreeNode(pptGitTreeBO);
+
+        if (!b){
+            return ActionResult.fail("提交失败");
+        }
+        return ActionResult.ok(key);
+    }
+
     public Object[] getTree(String resourceKey) {
         PptGitTreeExample pptGitTreeExample = new PptGitTreeExample();
         pptGitTreeExample.createCriteria()

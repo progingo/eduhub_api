@@ -233,7 +233,8 @@ public class PPTService {
         //新建节点
         ActionResult createActionResult = pptGitTreeApp.createNode(
                 user.getUsername(),
-                node1.getPptKey(),
+                node1.getKey(),
+                node2.getKey(),
                 pptKey,
                 "merge node");
 
