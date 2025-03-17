@@ -5,6 +5,7 @@ import org.progingo.application.PPTGitTreeApp;
 import org.progingo.application.PPTInfoApp;
 import org.progingo.controller.request.ppt.CommitPPTRequest;
 import org.progingo.controller.request.ppt.CreatePPTRequest;
+import org.progingo.controller.request.ppt.MergePPTRequest;
 import org.progingo.controller.request.ppt.SavePPTRequest;
 import org.progingo.controller.vo.PPTInfoVO;
 import org.progingo.dao.PptInfoDao;
@@ -13,6 +14,7 @@ import org.progingo.domain.resource.ResourceRepository;
 import org.progingo.domain.user.ActionResult;
 import org.progingo.domain.user.ResultCode;
 import org.progingo.domain.user.UserBO;
+import org.progingo.infrastructure.ppt.PPTHelper;
 import org.progingo.infrastructure.ppt.PPTInfoAdapter;
 import org.progingo.util.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +25,6 @@ import java.util.ArrayList;
 @Service
 public class PPTService {
 
-    @Autowired
-    private PptInfoDao pptInfoDao;
     @Autowired
     private ResourceRepository resourceRepository;
     @Autowired
@@ -37,6 +37,8 @@ public class PPTService {
     private PPTGitTreeApp pptGitTreeApp;
     @Autowired
     private PPTGitTreeRepository pptGitTreeRepository;
+    @Autowired
+    private PPTHelper pptHelper;
 
     public JsonResult savePPT(UserBO user, SavePPTRequest savePPTRequest){
         if (user.isTourist()){
@@ -105,7 +107,9 @@ public class PPTService {
         if (user.isTourist()){
             return JsonResult.fail(401, "请重新登陆");
         }
+
         String jsonString = JSON.toJSONString(commitPPTRequest.getSlides());
+
         PPTEntity pptEntity = new PPTEntity();
         pptEntity.setTitle(commitPPTRequest.getTitle());
         pptEntity.setSlides(jsonString);
@@ -127,15 +131,12 @@ public class PPTService {
         String pptKey = savePPTActionResult.getMsg();
 
         //新建节点
-
-
         ActionResult createActionResult = pptGitTreeApp.createNode(user.getUsername(), commitPPTRequest.getKey(), pptKey, commitPPTRequest.getRemark());
         if (!createActionResult.isSuccess()){
             return JsonResult.fail(createActionResult.getMsg());
         }
 
         //初始化完成ppt
-
         String nodeKey = createActionResult.getMsg();
         ActionResult actionResult = pptInfoApp.finishInitPPT(pptKey, nodeKey);
         if (!actionResult.isSuccess()){
@@ -169,23 +170,13 @@ public class PPTService {
         PptGitTreeBO node1 = pptGitTreeRepository.findByKey(key1);
         PptGitTreeBO node2 = pptGitTreeRepository.findByKey(key2);
 
-        if (node1 == null || node2 == null){
-            return JsonResult.fail("节点不存在");
-        }
-
-        //检查是否是同一个资源的节点
-        if (!node1.getResourceKey().equals(node2.getResourceKey())){
-            return JsonResult.fail("节点不在同一个资源中");
-        }
-
-        if (!resourceRepository.isEditor(user.getUsername(), node1.getResourceKey())){
+        if (!resourceRepository.isEditor(node1.getResourceKey(), user.getUsername())){
             return JsonResult.fail("权限不足");
         }
 
-        //检查是否存在父子关系
-        boolean haveConsanguinity = pptGitTreeApp.checkConsanguinity(node1.getKey(), node2.getKey());
-        if(haveConsanguinity){
-            return JsonResult.fail("两个节点不能是自己或子孙关系");
+        ActionResult checkActionResult = pptHelper.checkMergeNode(node1, node2);
+        if (!checkActionResult.isSuccess()){
+            return JsonResult.fail(checkActionResult.getMsg());
         }
 
         //获取两个节点内容
@@ -196,6 +187,68 @@ public class PPTService {
         datas.add(pptInfo2.getPptEntity().getSlides());
 
         return JsonResult.ok(datas);
+
+    }
+
+    public JsonResult mergePPT(UserBO user, MergePPTRequest mergePPTRequest) {
+
+        if (user.isTourist()){
+            return JsonResult.fail(401, "请重新登陆");
+        }
+
+        PptGitTreeBO node1 = pptGitTreeRepository.findByKey(mergePPTRequest.getKey1());
+        PptGitTreeBO node2 = pptGitTreeRepository.findByKey(mergePPTRequest.getKey2());
+
+        if (!resourceRepository.isEditor(node1.getResourceKey(), user.getUsername())){
+            return JsonResult.fail("权限不足");
+        }
+
+        ActionResult checkActionResult = pptHelper.checkMergeNode(node1, node2);
+        if (!checkActionResult.isSuccess()){
+            return JsonResult.fail(checkActionResult.getMsg());
+        }
+
+        //合并
+        String jsonString = JSON.toJSONString(mergePPTRequest.getSlides());
+
+        PPTEntity pptEntity = new PPTEntity();
+        pptEntity.setTitle(mergePPTRequest.getTitle());
+        pptEntity.setSlides(jsonString);
+        pptEntity.setViewportsize(mergePPTRequest.getViewportSize());
+        pptEntity.setViewportratio(mergePPTRequest.getViewportRatio());
+
+        PPTInfoBO pptInfoBO = PPTInfoBO.builder()
+                .key(node1.getPptKey())
+                .pptEntity(pptEntity)
+                .build();
+
+
+        //保存成新的ppt
+        ActionResult savePPTActionResult = pptInfoApp.createPPT(user.getUsername(), pptInfoBO);
+        if (!savePPTActionResult.isSuccess()){
+            return JsonResult.fail(savePPTActionResult.getMsg());
+        }
+        String pptKey = savePPTActionResult.getMsg();
+
+        //新建节点
+        ActionResult createActionResult = pptGitTreeApp.createNode(
+                user.getUsername(),
+                node1.getPptKey(),
+                pptKey,
+                "merge node");
+
+        if (!createActionResult.isSuccess()){
+            return JsonResult.fail(createActionResult.getMsg());
+        }
+
+        //初始化完成ppt
+        String nodeKey = createActionResult.getMsg();
+        ActionResult actionResult = pptInfoApp.finishInitPPT(pptKey, nodeKey);
+        if (!actionResult.isSuccess()){
+            return JsonResult.fail(actionResult.getMsg());
+        }
+
+        return JsonResult.ok();
 
     }
 }

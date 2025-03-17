@@ -4,6 +4,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.progingo.controller.request.ppt.CommitPPTRequest;
 import org.progingo.controller.request.ppt.CreatePPTRequest;
+import org.progingo.controller.request.ppt.MergePPTRequest;
 import org.progingo.controller.request.ppt.SavePPTRequest;
 import org.progingo.domain.user.UserBO;
 import org.progingo.service.PPTService;
@@ -71,12 +72,6 @@ public class PPTController {
 
         return pptService.getMergePPT(user, key1, key2);
 
-/*        String ppt1 = pptService.getPPT(id1);
-        String ppt2 = pptService.getPPT(id2);
-        ArrayList<String> datas = new ArrayList<>();
-        datas.add(ppt1);
-        datas.add(ppt2);*/
-        //return JsonResult.ok(datas);
     }
 
     @GetMapping("/init")
@@ -92,5 +87,18 @@ public class PPTController {
                 "      }\n" +
                 "    }\n" +
                 "  ]";
+    }
+
+    /**
+     *
+     * @param mergePPTRequest 这里面的两个key是节点的key
+     * @return
+     */
+    @PostMapping("/merge")
+    @RequiresAuthentication
+    public JsonResult mergePPT(@RequestBody MergePPTRequest mergePPTRequest){
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+        return pptService.mergePPT(user, mergePPTRequest);
+
     }
 }

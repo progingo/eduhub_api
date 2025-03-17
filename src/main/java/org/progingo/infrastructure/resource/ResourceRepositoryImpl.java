@@ -48,20 +48,14 @@ public class ResourceRepositoryImpl implements ResourceRepository {
 
         String projectKey = resource.getProjectKey();
 
-        // 判断用户是否是资源的创建者
-        boolean isResourceCreator = username.equals(resource.getUsername());
-
-        // 判断用户是否是项目的管理员或拥有者
-        boolean isProjectAdminOrOwner = projectMemberDao.countByExample(new ProjectMemberExample() {{
-            createCriteria()
-                    .andProjectKeyEqualTo(projectKey)
-                    .andUsernameEqualTo(username)
-                    .andRoleBetween(ProjectMemberRole.ADMIN.getCode(), ProjectMemberRole.MASTER.getCode())
-                    .andIsDeleteEqualTo(false);
-        }}) > 0;
-
-        // 用户是资源的创建者，或者是项目的管理员/拥有者
-        return isResourceCreator || isProjectAdminOrOwner;
+        ProjectMemberExample projectMemberExample = new ProjectMemberExample();
+        projectMemberExample.createCriteria()
+                .andProjectKeyEqualTo(projectKey)
+                .andUsernameEqualTo(username)
+                .andRoleBetween(ProjectMemberRole.MEMBER.getCode(), ProjectMemberRole.MASTER.getCode())
+                .andIsDeleteEqualTo(false);
+        long projectMemberNumber = projectMemberDao.countByExample(projectMemberExample);
+        return projectMemberNumber > 0;
     }
 
     /**
