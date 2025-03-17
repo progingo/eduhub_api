@@ -170,7 +170,17 @@ public class PPTGitTreeApp {
                             .target(pptGitTreeBO.getKey())
                             .animated(true)
                             .build();
+
                     edgesVOList.add(edgesVO);
+                    if (pptGitTreeBO.getOperation() == PPTTreeOperation.MERGE){
+                        Edges edgesVO2 = Edges.builder()
+                                .id("e" + pptGitTreeBO.getParentKey() + "-" + pptGitTreeBO.getKey())
+                                .source(pptGitTreeBO.getMergeParentKey())
+                                .target(pptGitTreeBO.getKey())
+                                .animated(true)
+                                .build();
+                        edgesVOList.add(edgesVO2);
+                    }
                 }
 
                 //获取当前节点子节点和数量
