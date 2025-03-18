@@ -7,6 +7,7 @@ import org.progingo.controller.request.ppt.CommitPPTRequest;
 import org.progingo.controller.request.ppt.CreatePPTRequest;
 import org.progingo.controller.request.ppt.MergePPTRequest;
 import org.progingo.controller.request.ppt.SavePPTRequest;
+import org.progingo.controller.vo.MyEditedPPTVO;
 import org.progingo.controller.vo.PPTInfoVO;
 import org.progingo.dao.PptInfoDao;
 import org.progingo.domain.ppt.*;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PPTService {
@@ -251,5 +253,16 @@ public class PPTService {
 
         return JsonResult.ok();
 
+    }
+
+    /**
+     * 获取我编辑过的ppt
+     */
+    public JsonResult getMyEditedPPT(UserBO user) {
+        if (user.isTourist()){
+            return JsonResult.ok(401,"请重新登陆");
+        }
+        List<MyEditedPPTVO> pptInfoVOList = pptRepository.getMyEditedPPT(user);
+        return JsonResult.ok(pptInfoVOList);
     }
 }

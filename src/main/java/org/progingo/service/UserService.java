@@ -154,6 +154,5 @@ public class UserService {
                 .map(x -> userAdapter.toVO(x))
                 .collect(Collectors.toList());
         return JsonResult.ok(userVOList);
-
     }
 }

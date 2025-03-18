@@ -16,9 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class PPTGitTreeApp {
@@ -223,5 +222,25 @@ public class PPTGitTreeApp {
 
         return false;
 
+    }
+
+
+    /**
+     * 根据key获取节点的信息
+     */
+    public PptGitTreeBO getNodeInfo(String key) {
+        return pptGitTreeRepository.findByKey(key);
+    }
+
+    /**
+     * 批量获取节点的信息
+     */
+    public Map<String, PptGitTreeBO> batchGetNodeInfo(Set<String> pptList) {
+        Map<String, PptGitTreeBO> map = new HashMap<>();
+        pptList.forEach(key -> {
+            PptGitTreeBO pptGitTreeBO = pptGitTreeRepository.findByKey(key);
+            map.put(key, pptGitTreeBO);
+        });
+        return map;
     }
 }

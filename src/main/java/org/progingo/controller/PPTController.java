@@ -101,4 +101,14 @@ public class PPTController {
         return pptService.mergePPT(user, mergePPTRequest);
 
     }
+
+    /**
+     * 获取用户正在编辑的节点
+     */
+    @GetMapping("/myEditedPPT")
+    @RequiresAuthentication
+    public JsonResult getMyEditedPPT(){
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+        return pptService.getMyEditedPPT(user);
+    }
 }
