@@ -9,5 +9,6 @@ public class Edges {
     private String id;
     private String source;
     private String target;
+    private String type;
     private boolean animated;
 }
