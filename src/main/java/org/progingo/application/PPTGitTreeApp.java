@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -139,14 +140,17 @@ public class PPTGitTreeApp {
         int level = 1;//层数
         int levelNodeNum = 1;//当前层数节点数量
         int nextLevelNodeNum = 0;//下一层节点数量
+        int maxNumLevelNodeNum = 1;//记录节点最多的层数的节点数
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 
         //前端需要的数据类型
         List<Node> nodesVOList = new LinkedList<>();
         List<Edges> edgesVOList = new LinkedList<>();
+        int[] levelNumberList = new int[100];
 
         while (!nodeList.isEmpty()){
             //拿到当前层节点
+            levelNumberList[level] = levelNodeNum;
             for(int i = 0;i < levelNodeNum;++i){
                 PptGitTreeBO pptGitTreeBO = nodeList.removeFirst();
                 //处理当前节点
@@ -159,29 +163,37 @@ public class PPTGitTreeApp {
                         )
                         .type("special")
                         .label(pptGitTreeBO.getRemark())
-                        .position(new Position(i * 290, level * 180))
+                        .position(new Position(0, level * 330))
+                        .level(level)
+                        .ind(i)
                         .build();
-                nodesVOList.add(nodeVO);
+
                 //关系信息
                 if (!pptGitTreeBO.getIsRoot()){
                     Edges edgesVO = Edges.builder()
                             .id("e" + pptGitTreeBO.getParentKey() + "-" + pptGitTreeBO.getKey())
                             .source(pptGitTreeBO.getParentKey())
                             .target(pptGitTreeBO.getKey())
+                            .type("default")
                             .animated(true)
                             .build();
 
                     edgesVOList.add(edgesVO);
                     if (pptGitTreeBO.getOperation() == PPTTreeOperation.MERGE){
                         Edges edgesVO2 = Edges.builder()
-                                .id("e" + pptGitTreeBO.getParentKey() + "-" + pptGitTreeBO.getKey())
+                                .id("e-" + pptGitTreeBO.getParentKey() + "-" + pptGitTreeBO.getKey())
                                 .source(pptGitTreeBO.getMergeParentKey())
                                 .target(pptGitTreeBO.getKey())
+                                .type("default")
                                 .animated(true)
                                 .build();
                         edgesVOList.add(edgesVO2);
+
+                        nodeVO.setPosition(new Position(0, nodeVO.getPosition().getY() + 165));//如果是合并节点，就错开位置
                     }
                 }
+
+                nodesVOList.add(nodeVO);
 
                 //获取当前节点子节点和数量
                 List<PptGitTreeBO> childrenNodeList = pptGitTreeRepository
@@ -190,10 +202,20 @@ public class PPTGitTreeApp {
                 nextLevelNodeNum += childrenNodeList.size();
                 //收集节点的前端数据结构
             }
+
+
+            maxNumLevelNodeNum =  Math.max(maxNumLevelNodeNum, levelNodeNum);
             levelNodeNum = nextLevelNodeNum;
             nextLevelNodeNum = 0;
             ++level;
         }
+
+        int widthTotal = maxNumLevelNodeNum * 300;
+        //调整节点的位置使其居中
+        for (Node nodeVO : nodesVOList){
+            nodeVO.getPosition().setX((int) (widthTotal / levelNumberList[nodeVO.getLevel()] * (nodeVO.getInd() + 0.4)));
+        }
+
 
         Object[] datas = new Object[2];
         datas[0] = nodesVOList;

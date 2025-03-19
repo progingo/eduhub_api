@@ -12,6 +12,9 @@ public class Node {
     private String type;
     private String label;
     private Position position;
+
+    private int level;
+    private int ind;//该节点在当前层的第几个
 }
 
 
