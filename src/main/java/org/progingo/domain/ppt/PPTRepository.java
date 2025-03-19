@@ -11,5 +11,5 @@ public interface PPTRepository {
     PPTInfoBO findPPTInfoByKey(String key);
 
     boolean updatePPTInfo(PPTInfoBO pptInfoBO);
-    List<MyEditedPPTVO> getMyEditedPPT(UserBO userBO);
+    List<MyEditedPPTVO> getMyEditedPPT(UserBO userBO, String resourceKey);
 }

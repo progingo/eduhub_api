@@ -258,11 +258,14 @@ public class PPTService {
     /**
      * 获取我编辑过的ppt
      */
-    public JsonResult getMyEditedPPT(UserBO user) {
+    public JsonResult getMyEditedPPT(UserBO user, String resourceKey) {
         if (user.isTourist()){
-            return JsonResult.ok(401,"请重新登陆");
+            return JsonResult.fail(401, "请重新登陆");
         }
-        List<MyEditedPPTVO> pptInfoVOList = pptRepository.getMyEditedPPT(user);
+        if(resourceKey == null){
+            return JsonResult.fail("请选择要查看的资源");
+        }
+        List<MyEditedPPTVO> pptInfoVOList = pptRepository.getMyEditedPPT(user, resourceKey);
         return JsonResult.ok(pptInfoVOList);
     }
 }

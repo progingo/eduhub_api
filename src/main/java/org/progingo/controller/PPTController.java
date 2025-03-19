@@ -105,10 +105,10 @@ public class PPTController {
     /**
      * 获取用户正在编辑的节点
      */
-    @GetMapping("/myEditedPPT")
+    @GetMapping("/myEditedPPT/{resourceKey}")
     @RequiresAuthentication
-    public JsonResult getMyEditedPPT(){
+    public JsonResult getMyEditedPPT(@PathVariable("resourceKey") String resourceKey){
         UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
-        return pptService.getMyEditedPPT(user);
+        return pptService.getMyEditedPPT(user,resourceKey);
     }
 }

@@ -226,10 +226,14 @@ public class PPTGitTreeApp {
 
 
     /**
-     * 根据key获取节点的信息
+     * resourceKey获取节点
      */
-    public PptGitTreeBO getNodeInfo(String key) {
-        return pptGitTreeRepository.findByKey(key);
+    public List<PptGitTree> getNodeInfoByResourceKey(String resourceKey) {
+        PptGitTreeExample pptGitTreeExample = new PptGitTreeExample();
+        pptGitTreeExample.createCriteria()
+                .andResourceKeyEqualTo(resourceKey)
+                .andIsDeleteEqualTo(false);
+        return pptGitTreeDao.selectByExample(pptGitTreeExample);
     }
 
     /**

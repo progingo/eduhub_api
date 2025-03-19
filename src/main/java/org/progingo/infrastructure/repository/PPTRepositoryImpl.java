@@ -5,7 +5,10 @@ import org.progingo.application.UserApp;
 import org.progingo.controller.vo.MyEditedPPTVO;
 import org.progingo.controller.vo.UserInfoVO;
 import org.progingo.dao.PptInfoDao;
+import org.progingo.dao.ResourceDao;
+import org.progingo.domain.PptGitTree;
 import org.progingo.domain.ppt.*;
+import org.progingo.domain.resource.ResourceExample;
 import org.progingo.domain.user.UserBO;
 import org.progingo.infrastructure.ppt.PPTInfoAdapter;
 import org.progingo.service.UserService;
@@ -27,6 +30,8 @@ public class PPTRepositoryImpl implements PPTRepository {
     private UserAdapter userAdapter;
     @Autowired
     private PPTGitTreeApp pptGitTreeApp;
+    @Autowired
+    private ResourceDao resourceDao;
 
     @Override
     public boolean addPPTInfo(PPTInfoBO pptInfoBO) {
@@ -62,24 +67,26 @@ public class PPTRepositoryImpl implements PPTRepository {
      * @return
      */
     @Override
-    public List<MyEditedPPTVO> getMyEditedPPT(UserBO user) {
-        List<PptInfo> creatingPptList = getCreatingPptList(user.getUsername());
+    public List<MyEditedPPTVO> getMyEditedPPT(UserBO user, String resourceKey) {
+        List<PptGitTree> nodeInfoByResourceKey = pptGitTreeApp.getNodeInfoByResourceKey(resourceKey);
+        List<PptInfo> creatingPptList = getCreatingPptList(user.getUsername(),nodeInfoByResourceKey);
         if (creatingPptList.isEmpty()) {
             return Collections.emptyList();
         }
-
         UserInfoVO userVO = convertToUserVO(user);
-        Map<String, PptGitTreeBO> nodeInfoMap = batchGetNodeInfo(creatingPptList);
 
         return creatingPptList.stream()
-                .map(pptInfo -> buildMyEditedPPTVO(pptInfo, userVO, nodeInfoMap))
+                .map(pptInfo -> buildMyEditedPPTVO(pptInfo, userVO, nodeInfoByResourceKey))
                 .collect(Collectors.toList());
     }
 
-    private List<PptInfo> getCreatingPptList(String username) {
+    private List<PptInfo> getCreatingPptList(String username, List<PptGitTree> nodeInfoByResourceKey) {
         PptInfoExample example = new PptInfoExample();
         example.createCriteria()
                 .andUsernameEqualTo(username)
+                .andNodeKeyIn(nodeInfoByResourceKey.stream()
+                        .map(PptGitTree::getKey)
+                        .collect(Collectors.toList()))
                 .andStateEqualTo(PPTState.CREAET.getCode());
         return pptInfoDao.selectByExample(example);
     }
@@ -88,22 +95,20 @@ public class PPTRepositoryImpl implements PPTRepository {
         return userAdapter.toVO(user);
     }
 
-    private Map<String, PptGitTreeBO> batchGetNodeInfo(List<PptInfo> pptList) {
-        Set<String> nodeKeys = pptList.stream()
-                .map(PptInfo::getNodeKey)
-                .collect(Collectors.toSet());
-        return pptGitTreeApp.batchGetNodeInfo(nodeKeys);
-    }
 
-    private MyEditedPPTVO buildMyEditedPPTVO(PptInfo pptInfo, UserInfoVO userVO, Map<String, PptGitTreeBO> nodeInfoMap) {
-        PptGitTreeBO nodeInfo = nodeInfoMap.getOrDefault(pptInfo.getNodeKey(),
-                PptGitTreeBO.builder()
-                        .remark("") // 默认值
-                        .build());
-
+    private MyEditedPPTVO buildMyEditedPPTVO(PptInfo pptInfo, UserInfoVO userVO, List<PptGitTree> nodeInfoByResourceKey) {
+        PptGitTree nodeInfo = nodeInfoByResourceKey.stream()
+                .filter(pptGitTree -> pptGitTree.getKey().equals(pptInfo.getNodeKey())) //
+                .findFirst()
+                .orElse(null);
+        ResourceExample resourceExample = new ResourceExample();
+        assert nodeInfo != null;
+        resourceExample.createCriteria().andKeyEqualTo(nodeInfo.getResourceKey());
+        String resourceName = Objects.requireNonNull(resourceDao.selectByExample(resourceExample).stream().findFirst().orElse(null)).getName();
         return MyEditedPPTVO.builder()
                 .userInfoVO(userVO)
                 .key(pptInfo.getKey())
+                .resourceName(resourceName)
                 .nodeRemark(nodeInfo.getRemark())
                 .nodeKey(pptInfo.getNodeKey())
                 .title(pptInfo.getTitle())

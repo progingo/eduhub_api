@@ -15,6 +15,7 @@ public class MyEditedPPTVO {
     private String nodeRemark; // 节点描述
     private String nodeKey; // 节点key
     private String title;// ppt标题
+    private String resourceName; // 资源名称
     private Date gmtCreate; // 创建时间
 
     private Date gmtUpdate; // 更新时间
