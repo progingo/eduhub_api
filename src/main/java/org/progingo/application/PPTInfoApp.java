@@ -7,6 +7,7 @@ import org.progingo.infrastructure.ppt.PPTInfoAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -112,6 +113,13 @@ public class PPTInfoApp {
         }
 
         return ActionResult.ok(key);
+
+    }
+
+    public PPTInfoBO findPPTInfoByNode(String nodeKey){
+        String pptKey = pptGitTreeRepository.findPPTKeyByNodeKey(nodeKey);
+        PPTInfoBO pptInfoByKey = pptRepository.findPPTInfoByKey(pptKey);
+        return pptInfoByKey;
 
     }
 }

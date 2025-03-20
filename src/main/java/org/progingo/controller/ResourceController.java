@@ -5,6 +5,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.progingo.controller.request.resource.CreateResourceRequest;
 import org.progingo.controller.request.resource.GetResourceListRequest;
 import org.progingo.controller.request.resource.ResourceRequest;
+import org.progingo.controller.request.resource.UpdateShowResourceRequest;
 import org.progingo.domain.user.UserBO;
 import org.progingo.service.ResourceService;
 import org.progingo.util.JsonResult;
@@ -52,6 +53,22 @@ public class ResourceController {
     public JsonResult deleteResource(@RequestBody ResourceRequest resourceRequest) {
         UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
         return resourceService.deleteResource(user, resourceRequest.getResourceKey());
+    }
+
+    /**
+     * 获取一个资源的“资源展示”内容
+     * @return
+     */
+    @GetMapping("/{resourceKey}/showResource")
+    public JsonResult getShowResourceData(@PathVariable String resourceKey){
+        return resourceService.getShowResourceData(resourceKey);
+    }
+
+    @PutMapping("/updateShowData")
+    @RequiresAuthentication
+    public JsonResult updateShowResourceData(@RequestBody UpdateShowResourceRequest updateShowResourceRequest){
+        UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
+        return resourceService.updateResourceShowState(user, updateShowResourceRequest);
     }
 
 }
