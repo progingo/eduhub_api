@@ -82,7 +82,6 @@ public class PPTInfoApp {
             return ActionResult.fail(ResultCode.PPT_NOT_EXIST);
         }
         pptInfo.setPptEntity(pptInfoBO.getPptEntity());
-        pptInfo.setState(pptInfoBO.getState());
 
         boolean r = pptRepository.updatePPTInfo(pptInfo);
         if (!r){

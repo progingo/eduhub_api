@@ -57,7 +57,6 @@ public class PPTController {
 
 
     /**
-     *
      * @param key1 第一个节点的ppt_tree的key
      * @param key2 第二个节点的ppt_tree的key
      * @return
@@ -102,7 +101,7 @@ public class PPTController {
     }
 
     /**
-     * 获取用户正在编辑的节点
+     * 获取我的编辑的ppt
      */
     @GetMapping("/myEditedPPT/{resourceKey}")
     @RequiresAuthentication

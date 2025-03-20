@@ -56,7 +56,6 @@ public class PPTService {
         PPTInfoBO pptInfoBO = PPTInfoBO.builder()
                 .key(savePPTRequest.getKey())
                 .pptEntity(pptEntity)
-                .state(PPTState.CREAET)
                 .build();
 
 
@@ -121,11 +120,8 @@ public class PPTService {
         PPTInfoBO pptInfoBO = PPTInfoBO.builder()
                 .key(commitPPTRequest.getKey())
                 .pptEntity(pptEntity)
-                .state(PPTState.DELETE)
                 .build();
 
-        // 修改提交前的ppt状态为删除（2）
-        ActionResult  deleteActionResult = pptInfoApp.updatePPT(user.getUsername(), pptInfoBO);
 
         //保存成新的ppt
         ActionResult savePPTActionResult = pptInfoApp.createPPT(user.getUsername(), pptInfoBO);
