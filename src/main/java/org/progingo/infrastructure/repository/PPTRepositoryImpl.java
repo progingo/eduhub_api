@@ -80,22 +80,49 @@ public class PPTRepositoryImpl implements PPTRepository {
                 .collect(Collectors.toList());
     }
 
+    /**
+     *  获取用户正在编辑的ppt信息
+     * @param username
+     * @param nodeInfoByResourceKey
+     * @return
+     */
     private List<PptInfo> getCreatingPptList(String username, List<PptGitTree> nodeInfoByResourceKey) {
+        List<PptInfo> pptInfos = new ArrayList<>();
         PptInfoExample example = new PptInfoExample();
         example.createCriteria()
                 .andUsernameEqualTo(username)
                 .andNodeKeyIn(nodeInfoByResourceKey.stream()
                         .map(PptGitTree::getKey)
-                        .collect(Collectors.toList()))
-                .andStateEqualTo(PPTState.CREAET.getCode());
-        return pptInfoDao.selectByExample(example);
+                        .collect(Collectors.toList()));
+        List<PptInfo> oldPptInfos  = pptInfoDao.selectByExample(example);
+        // 根据条件获取到相应的pptInfo后,过滤掉PptGitTree中的resourceKey与oldPptInfos中的key相同的数据，
+        // 剩下的传入到pptInfos
+        for (PptInfo oldPptInfo : oldPptInfos) {
+            if (nodeInfoByResourceKey.stream()
+                    .noneMatch(pptGitTree -> pptGitTree.getPptKey().equals(oldPptInfo.getKey()))) {
+                pptInfos.add(oldPptInfo);
+            }
+        }
+        return pptInfos;
     }
 
+    /**
+     * 将用户信息转换为VO
+     * @param user
+     * @return
+     */
     private UserInfoVO convertToUserVO(UserBO user) {
         return userAdapter.toVO(user);
     }
 
 
+    /**
+     * 构建正在编辑的ppt信息
+     * @param pptInfo
+     * @param userVO
+     * @param nodeInfoByResourceKey
+     * @return
+     */
     private MyEditedPPTVO buildMyEditedPPTVO(PptInfo pptInfo, UserInfoVO userVO, List<PptGitTree> nodeInfoByResourceKey) {
         PptGitTree nodeInfo = nodeInfoByResourceKey.stream()
                 .filter(pptGitTree -> pptGitTree.getKey().equals(pptInfo.getNodeKey())) //
@@ -117,6 +144,11 @@ public class PPTRepositoryImpl implements PPTRepository {
                 .build();
     }
 
+    /**
+     * 将PPTInfoBO转换为PptInfo
+     * @param pptInfoBO
+     * @return
+     */
     private PptInfo adapter(PPTInfoBO pptInfoBO){
 
         PptInfo pptInfo = PptInfo.builder()
