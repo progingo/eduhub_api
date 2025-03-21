@@ -6,4 +6,5 @@ import lombok.Data;
 public class UserUpdateBaseInfoRequest {
     private String nickname;
     private String email;
+    private String profilePhotoId;
 }

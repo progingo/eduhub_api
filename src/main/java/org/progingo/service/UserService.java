@@ -1,11 +1,13 @@
 package org.progingo.service;
 
+import org.progingo.application.FileApp;
 import org.progingo.application.UserApp;
 import org.progingo.controller.request.user.UserLoginRequest;
 import org.progingo.controller.request.user.UserSignRequest;
 import org.progingo.controller.request.user.UserUpdateBaseInfoRequest;
 import org.progingo.controller.vo.ProjectVO;
 import org.progingo.controller.vo.UserInfoVO;
+import org.progingo.domain.FileUploadRecord;
 import org.progingo.domain.project.ProjectBO;
 import org.progingo.domain.project.ProjectRepository;
 import org.progingo.domain.user.*;
@@ -33,6 +35,8 @@ public class UserService {
     private ProjectRepository projectRepository;
     @Autowired
     private ProjectAdapter projectAdapter;
+    @Autowired
+    private FileApp fileApp;
 
     public JsonResult signUser(UserSignRequest userSignRequest) {
         User signUser = User.builder()
@@ -100,6 +104,11 @@ public class UserService {
                 .nickname(userUpdateBaseInfoRequest.getNickname())
                 .email(userUpdateBaseInfoRequest.getEmail())
                 .build();
+
+        if (userUpdateBaseInfoRequest.getProfilePhotoId() != null && !userUpdateBaseInfoRequest.getProfilePhotoId().isEmpty()){
+            FileUploadRecord file = fileApp.findFileById(user, Long.parseLong(userUpdateBaseInfoRequest.getProfilePhotoId()));
+            updateUser.setProfilePhoto(file.getUrl());
+        }
 
         updateUser.setId(user.getId());
 

@@ -2,6 +2,8 @@
 package org.progingo.service;
 
 import io.minio.errors.*;
+import org.progingo.constant.UserConstant;
+import org.progingo.controller.vo.UpdateFileVO;
 import org.progingo.dao.FileUploadRecordDao;
 import org.progingo.domain.FileUploadRecord;
 import org.progingo.domain.user.UserBO;
@@ -53,6 +55,10 @@ public class FileService {
                 .build();
         fileUploadRecordDao.insert(uploadRecord);
 
-        return JsonResult.ok(filePath);
+        UpdateFileVO updateFileVO = UpdateFileVO.builder()
+                .id(uploadRecord.getId())
+                .url(UserConstant.PROFILE_PHOTO_URL + filePath)
+                .build();
+        return JsonResult.ok(updateFileVO);
     }
 }
