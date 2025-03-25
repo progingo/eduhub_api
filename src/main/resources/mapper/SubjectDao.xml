@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.progingo.dao.SubjectDao">
+  <resultMap id="BaseResultMap" type="org.progingo.domain.subject.Subject">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="key" jdbcType="VARCHAR" property="key" />
+    <result column="resource_key" jdbcType="VARCHAR" property="resourceKey" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="xx1" jdbcType="VARCHAR" property="xx1" />
+    <result column="xx2" jdbcType="VARCHAR" property="xx2" />
+    <result column="xx3" jdbcType="VARCHAR" property="xx3" />
+    <result column="xx4" jdbcType="VARCHAR" property="xx4" />
+    <result column="xx5" jdbcType="VARCHAR" property="xx5" />
+    <result column="answer" jdbcType="VARCHAR" property="answer" />
+    <result column="kind" jdbcType="INTEGER" property="kind" />
+    <result column="analysis" jdbcType="VARCHAR" property="analysis" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="is_delete" jdbcType="BOOLEAN" property="isDelete" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, `key`, resource_key, title, xx1, xx2, xx3, xx4, xx5, answer, kind, analysis, 
+    gmt_create, is_delete
+  </sql>
+  <select id="selectByExample" parameterType="org.progingo.domain.subject.SubjectExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from subject
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from subject
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from subject
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="org.progingo.domain.subject.SubjectExample">
+    delete from subject
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.subject.Subject" useGeneratedKeys="true">
+    insert into subject (`key`, resource_key, title, 
+      xx1, xx2, xx3, xx4, 
+      xx5, answer, kind, 
+      analysis, gmt_create, is_delete
+      )
+    values (#{key,jdbcType=VARCHAR}, #{resourceKey,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+      #{xx1,jdbcType=VARCHAR}, #{xx2,jdbcType=VARCHAR}, #{xx3,jdbcType=VARCHAR}, #{xx4,jdbcType=VARCHAR}, 
+      #{xx5,jdbcType=VARCHAR}, #{answer,jdbcType=VARCHAR}, #{kind,jdbcType=INTEGER}, 
+      #{analysis,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, #{isDelete,jdbcType=BOOLEAN}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="org.progingo.domain.subject.Subject" useGeneratedKeys="true">
+    insert into subject
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="key != null">
+        `key`,
+      </if>
+      <if test="resourceKey != null">
+        resource_key,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="xx1 != null">
+        xx1,
+      </if>
+      <if test="xx2 != null">
+        xx2,
+      </if>
+      <if test="xx3 != null">
+        xx3,
+      </if>
+      <if test="xx4 != null">
+        xx4,
+      </if>
+      <if test="xx5 != null">
+        xx5,
+      </if>
+      <if test="answer != null">
+        answer,
+      </if>
+      <if test="kind != null">
+        kind,
+      </if>
+      <if test="analysis != null">
+        analysis,
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="key != null">
+        #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="resourceKey != null">
+        #{resourceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="xx1 != null">
+        #{xx1,jdbcType=VARCHAR},
+      </if>
+      <if test="xx2 != null">
+        #{xx2,jdbcType=VARCHAR},
+      </if>
+      <if test="xx3 != null">
+        #{xx3,jdbcType=VARCHAR},
+      </if>
+      <if test="xx4 != null">
+        #{xx4,jdbcType=VARCHAR},
+      </if>
+      <if test="xx5 != null">
+        #{xx5,jdbcType=VARCHAR},
+      </if>
+      <if test="answer != null">
+        #{answer,jdbcType=VARCHAR},
+      </if>
+      <if test="kind != null">
+        #{kind,jdbcType=INTEGER},
+      </if>
+      <if test="analysis != null">
+        #{analysis,jdbcType=VARCHAR},
+      </if>
+      <if test="gmtCreate != null">
+        #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=BOOLEAN},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="org.progingo.domain.subject.SubjectExample" resultType="java.lang.Long">
+    select count(*) from subject
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update subject
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.key != null">
+        `key` = #{record.key,jdbcType=VARCHAR},
+      </if>
+      <if test="record.resourceKey != null">
+        resource_key = #{record.resourceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.title != null">
+        title = #{record.title,jdbcType=VARCHAR},
+      </if>
+      <if test="record.xx1 != null">
+        xx1 = #{record.xx1,jdbcType=VARCHAR},
+      </if>
+      <if test="record.xx2 != null">
+        xx2 = #{record.xx2,jdbcType=VARCHAR},
+      </if>
+      <if test="record.xx3 != null">
+        xx3 = #{record.xx3,jdbcType=VARCHAR},
+      </if>
+      <if test="record.xx4 != null">
+        xx4 = #{record.xx4,jdbcType=VARCHAR},
+      </if>
+      <if test="record.xx5 != null">
+        xx5 = #{record.xx5,jdbcType=VARCHAR},
+      </if>
+      <if test="record.answer != null">
+        answer = #{record.answer,jdbcType=VARCHAR},
+      </if>
+      <if test="record.kind != null">
+        kind = #{record.kind,jdbcType=INTEGER},
+      </if>
+      <if test="record.analysis != null">
+        analysis = #{record.analysis,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gmtCreate != null">
+        gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.isDelete != null">
+        is_delete = #{record.isDelete,jdbcType=BOOLEAN},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update subject
+    set id = #{record.id,jdbcType=BIGINT},
+      `key` = #{record.key,jdbcType=VARCHAR},
+      resource_key = #{record.resourceKey,jdbcType=VARCHAR},
+      title = #{record.title,jdbcType=VARCHAR},
+      xx1 = #{record.xx1,jdbcType=VARCHAR},
+      xx2 = #{record.xx2,jdbcType=VARCHAR},
+      xx3 = #{record.xx3,jdbcType=VARCHAR},
+      xx4 = #{record.xx4,jdbcType=VARCHAR},
+      xx5 = #{record.xx5,jdbcType=VARCHAR},
+      answer = #{record.answer,jdbcType=VARCHAR},
+      kind = #{record.kind,jdbcType=INTEGER},
+      analysis = #{record.analysis,jdbcType=VARCHAR},
+      gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+      is_delete = #{record.isDelete,jdbcType=BOOLEAN}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="org.progingo.domain.subject.Subject">
+    update subject
+    <set>
+      <if test="key != null">
+        `key` = #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="resourceKey != null">
+        resource_key = #{resourceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="xx1 != null">
+        xx1 = #{xx1,jdbcType=VARCHAR},
+      </if>
+      <if test="xx2 != null">
+        xx2 = #{xx2,jdbcType=VARCHAR},
+      </if>
+      <if test="xx3 != null">
+        xx3 = #{xx3,jdbcType=VARCHAR},
+      </if>
+      <if test="xx4 != null">
+        xx4 = #{xx4,jdbcType=VARCHAR},
+      </if>
+      <if test="xx5 != null">
+        xx5 = #{xx5,jdbcType=VARCHAR},
+      </if>
+      <if test="answer != null">
+        answer = #{answer,jdbcType=VARCHAR},
+      </if>
+      <if test="kind != null">
+        kind = #{kind,jdbcType=INTEGER},
+      </if>
+      <if test="analysis != null">
+        analysis = #{analysis,jdbcType=VARCHAR},
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=BOOLEAN},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.progingo.domain.subject.Subject">
+    update subject
+    set `key` = #{key,jdbcType=VARCHAR},
+      resource_key = #{resourceKey,jdbcType=VARCHAR},
+      title = #{title,jdbcType=VARCHAR},
+      xx1 = #{xx1,jdbcType=VARCHAR},
+      xx2 = #{xx2,jdbcType=VARCHAR},
+      xx3 = #{xx3,jdbcType=VARCHAR},
+      xx4 = #{xx4,jdbcType=VARCHAR},
+      xx5 = #{xx5,jdbcType=VARCHAR},
+      answer = #{answer,jdbcType=VARCHAR},
+      kind = #{kind,jdbcType=INTEGER},
+      analysis = #{analysis,jdbcType=VARCHAR},
+      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      is_delete = #{isDelete,jdbcType=BOOLEAN}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
