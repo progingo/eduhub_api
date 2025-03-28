@@ -18,7 +18,7 @@ public class SubjectController {
 
     @PostMapping("/add")
     @RequiresAuthentication
-    private JsonResult addSubject(@RequestBody AddSubjectRequest addSubjectRequest){
+    public JsonResult addSubject(@RequestBody AddSubjectRequest addSubjectRequest){
         UserBO user = (UserBO) SecurityUtils.getSubject().getPrincipal();
         JsonResult jsonResult = subjectService.addSubject(user, addSubjectRequest);
         return jsonResult;
